@@ -8,3 +8,4 @@
 - Style tools pick from the LoRAs you have installed.
 - "Where does this file go" hints now know every loader the hub uses.
 - Fonts are embedded; the hub no longer calls Google Fonts.
+- Optional server-side safety guard for shared ComfyUI machines (works with current async ComfyUI; skips negative prompts; reads text from string and primitive nodes).

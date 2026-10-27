@@ -117,6 +117,8 @@ Settings, your gallery and prompt history stay in your browser's local storage. 
 
 The hub has a built-in prompt filter. It blocks sexual content, sexual content involving minors and graphic violence before anything is sent to ComfyUI.
 
+If other people use your ComfyUI, also install the optional [server-side guard](server-guard/README.md). It applies the same rules inside ComfyUI, to every job from any app.
+
 ## License
 
 MIT. See [LICENSE](LICENSE). The embedded fonts (IBM Plex Sans, IBM Plex Mono and VT323) are under the SIL Open Font License; see [NOTICE.md](NOTICE.md).
