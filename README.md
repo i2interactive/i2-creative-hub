@@ -17,6 +17,7 @@ No install, no account, no server of its own. It's one HTML file that talks to t
 - **Template Import.** ComfyUI's own template library, inside the hub. Pick a template, see which model files you're missing, and turn it into a hub tool. New models usually land there on release day.
 - **NVIDIA RTX video tools.** Instant upscale, denoise, deblur and SDR-to-HDR on your RTX card.
 - **Built for 8GB cards.** Developed on an RTX 3070 Ti. Low VRAM mode, an out-of-memory rescue, and automatic fast drafts help on smaller cards.
+- **MIDI controller.** A Polyend Tracker running i2 DECK drives the hub from its HUB deck: queue, seeds, results, tool slots and the main knobs on the wheel. Chrome or Edge; see [docs/MIDI.md](docs/MIDI.md).
 - **Credits on every render.** Each output records the models, LoRAs and inputs that made it, with a one-click disclosure line.
 
 ## Quick start
@@ -125,4 +126,4 @@ MIT. See [LICENSE](LICENSE). The embedded fonts (IBM Plex Sans, IBM Plex Mono an
 
 Made by Ian Isom at [i2 interactive](https://i2interactive.com) in San Diego.
 
-Version 1.21.1.
+Version 1.22.0.

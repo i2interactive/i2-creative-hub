@@ -1024,7 +1024,7 @@ const BRAND={
   name:'i2 interactive Creative Hub',         // browser tab + about
   title:'interactive creative hub',           // boot-screen subtitle
   credit:'Made by Ian × Claude',              // footer / about line
-  version:'1.21.1',                            // shown in the connection panel + logo tooltip
+  version:'1.22.0',                            // shown in the connection panel + logo tooltip
   accent:'',                                  // '' = default teal; or a hex like '#4DD8C0'
   server:''                                   // '' = use the built-in default; or 'http://gpu-host:8188'
 };
@@ -6211,7 +6211,7 @@ function _applyLowVram(wf){try{Object.values(wf).forEach(n=>{if(!n||!n.class_typ
 function _syncLowVramPill(){const b=document.getElementById('lowvramPill');if(b)b.classList.toggle('on',!!S.lowVram)}
 function toggleLowVram(){S.lowVram=!S.lowVram;try{localStorage.setItem('i2hub_lowvram',S.lowVram?'1':'0')}catch(_){}_syncLowVramPill();if(S.activeModule==='asset-gallery'&&S.assetTab==='settings'){try{renderAssetGallery()}catch(_){}}showToast(S.lowVram?'Low VRAM mode ON — CPU text encoders + tiled decode':'Low VRAM mode OFF','success')}
 function exportSettings(){
- const keys=['i2hub_styles','i2hub_wildcards','i2hub_favs','i2hub_bibles','i2hub_forms','i2hub_outputPaths','i2hub_server','i2hub_autoUpscale','i2hub_batch','i2hub_lowvram','i2hub_hidden','i2hub_projects','i2hub_activeProject','i2hub_prompthistory','i2hub_gallery','i2hub_shotlist','i2hub_contactsheet','i2hub_settings','i2hub_agent','i2hub_series','i2hub_ghost','i2hub_h3script','i2hub_songsheet','i2hub_tools'];
+ const keys=['i2hub_styles','i2hub_wildcards','i2hub_favs','i2hub_bibles','i2hub_forms','i2hub_outputPaths','i2hub_server','i2hub_autoUpscale','i2hub_batch','i2hub_lowvram','i2hub_hidden','i2hub_projects','i2hub_activeProject','i2hub_prompthistory','i2hub_gallery','i2hub_shotlist','i2hub_contactsheet','i2hub_settings','i2hub_agent','i2hub_series','i2hub_ghost','i2hub_h3script','i2hub_songsheet','i2hub_tools','i2hub_midi'];
  const data={};keys.forEach(k=>{const v=localStorage.getItem(k);if(v!=null)data[k]=v});
  const blob={app:'i2 interactive Creative Hub',kind:'settings-backup',version:1,exported:new Date().toISOString(),data};
  const b=new Blob([JSON.stringify(blob,null,2)],{type:'application/json'});const url=URL.createObjectURL(b);
@@ -6242,6 +6242,7 @@ function renderSettingsTab(){
   let h='<div style="display:flex;flex-direction:column;gap:16px"><div style="font-size:13px;color:var(--text-secondary);margin-bottom:4px">Set the local folder paths for each asset type. Edit any path, then use ⧉ to copy it to your clipboard for quick access in File Explorer.</div>';
   h+=_renderLibCard();
   h+='<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;margin-bottom:14px"><div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-weight:600;font-size:13px;margin-bottom:4px">⚡ Low VRAM Mode</div><div style="font-size:11px;color:var(--text-tertiary)">Runs text encoders on CPU and uses tiled VAE decode on every render. Each step is a touch slower, but frees VRAM for the model itself — the 8GB special.</div></div><button onclick="toggleLowVram()" style="flex:none;margin-left:14px;background:'+(S.lowVram?'rgba(77,216,192,0.15)':'var(--bg-panel)')+';border:1px solid '+(S.lowVram?'var(--accent-primary)':'var(--border)')+';color:'+(S.lowVram?'var(--accent-primary)':'var(--text-secondary)')+';font-size:11px;font-weight:700;padding:8px 16px;border-radius:4px;cursor:pointer;font-family:var(--font-ui)">'+(S.lowVram?'ON':'OFF')+'</button></div></div>';
+  h+=_midiCard();
   P.forEach(function(p){
     const val=S.outputPaths[p.k]||'';
     h+='<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px">';
@@ -7723,6 +7724,341 @@ function runBootSequence(){
 }
 runBootSequence();
 
+// ════════════════════════════════════════════════════════════════
+//  MIDI CONTROLLER (1.22) — the HUB deck of i2 DECK (the custom
+//  firmware on a Polyend Tracker) drives the hub over USB MIDI.
+//  Off until you turn it on in Settings. Web MIDI only (Chrome, Edge);
+//  input only, nothing is sent back and nothing leaves the machine.
+//  The deck's protocol (core/interface/i2Deck in tracker-i2-edition):
+//    pads  = note on (velocity 100) / note off, note = pad 0-47, channel 1
+//    wheel = control change 1-7 on channel 1, relative: 65 = +1, 63 = -1
+//  Pad numbers run across the Tracker's 12×4 grid, so each 4×4 block
+//  is note = row*12 + block*4 + column. Full map: docs/MIDI.md.
+// ════════════════════════════════════════════════════════════════
+const MIDI_KEY='i2hub_midi';
+const MIDI={cfg:{on:false,port:'',slots:[]},access:null,input:null,state:'off',err:'',last:'',lastAt:0,nsCur:null,_hud:0};
+try{const c=JSON.parse(localStorage.getItem(MIDI_KEY)||'{}');if(c&&typeof c==='object'){MIDI.cfg.on=!!c.on;MIDI.cfg.port=typeof c.port==='string'?c.port:'';MIDI.cfg.slots=Array.isArray(c.slots)?c.slots.slice(0,16):[]}}catch(_){}
+function _midiSave(){try{localStorage.setItem(MIDI_KEY,JSON.stringify(MIDI.cfg))}catch(_){}}
+const MIDI_PORT_RE=/tracker|polyend|i2 ?deck/i;
+// the deck's three 4×4 blocks, in the order the deck file lists them
+const MIDI_BLOCKS=[
+ ['RUN','STOP','CLR','AGN','SEED','LOCK','B1','B4','PRV','NXT','KEEP','TOSS','SAVE','SEND','OPEN','HOME'],
+ ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12','W13','W14','W15','W16'],
+ ['1:1','16:9','9:16','4:3','DRFT','GOOD','BEST','UPSC','S1','S2','S3','S4','S5','S6','S7','S8']];
+const MIDI_PADS=(()=>{const a=new Array(48);MIDI_BLOCKS.forEach((b,bi)=>b.forEach((l,s)=>{a[(s>>2)*12+bi*4+(s&3)]=l}));return a})();
+const MIDI_DIALS=[null,'steps','cfg','denoise','seed','width','height','batch'];
+const MIDI_HELP=[
+ ['RUN','Run the open tool (Ctrl+Enter). Live on: keep the full-quality render. Night Shift: start the night. World Builder, Pipeline, Node Canvas, Action Stage, Live Canvas: their main run button'],
+ ['STOP','Stop the render that is running; the rest of the queue carries on (Skip). Night Shift / World Builder: stop'],
+ ['CLR','Cancel all: clear the queue and stop the current render'],
+ ['AGN','Run the last tool you ran again, with its current settings'],
+ ['SEED','New seed: rolls a fresh fixed seed on the open tool (Live: a new live seed)'],
+ ['LOCK','Lock or unlock the seed: locks to your last render’s seed, unlock = random every render'],
+ ['B1 / B4','Make ×1 / ×4 per run'],
+ ['PRV / NXT','Step through your results in the viewer (Night Shift: step through the takes)'],
+ ['KEEP','Star the result (Night Shift: ★ Keep the take)'],
+ ['TOSS','Take the result off the hub’s list; the file stays on disk (Night Shift: ✕ Cut the take)'],
+ ['SAVE','Download the result'],
+ ['SEND','Put the result (a picture) into the open tool as its source (Night Shift: Use the take in its tool)'],
+ ['OPEN','Open or close the result in the viewer'],
+ ['HOME','Back to the index'],
+ ['W1–W16','Open a tool. Pick them under Workflow slots; Auto follows the channel guide order'],
+ ['1:1 16:9 9:16 4:3','Aspect ratio on the open tool (its Aspect Ratio list, or width and height at the same pixel count)'],
+ ['DRFT / GOOD / BEST','The tool’s Quality presets: Draft / Balanced / Max'],
+ ['UPSC','Send the result picture to SeedVR2 Upscale'],
+ ['S1–S8','Turn your pinned looks on or off (the 1st to 8th pinned look that fits the tool)'],
+ ['Wheel','STEPS, CFG, DENOISE, SEED, WIDTH, HEIGHT (no width/height: megapixels), BATCH on the open tool']];
+
+// ── where things are ──
+function _midiMod(){const m=S.view==='module'?MODULES.find(x=>x.id===S.activeModule):null;return m||null}
+function _midiPlain(m){return !!m&&!(m.agent||m.episode||m.promptLab||m.importer||m.nightShift||m.liveCanvas||m.canvas||m.graph||m.stage||m.isGallery||m.isSettings||m.guide)}
+function _midiField(mod,fid){return[...(mod.simple||[]),...(mod.advanced||[])].find(f=>f.id===fid)}
+function _midiEl(mod,fid){return document.getElementById('input-'+mod.id+'-'+fid)}
+function _midiSet(mod,fid,val){
+ const el=_midiEl(mod,fid);if(!el)return false;
+ el.value=val;const c=document.getElementById(el.id+'-val');if(c)c.value=el.value;
+ el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));
+ try{saveFormValues(mod)}catch(_){}
+ return true;
+}
+function _midiDec(st){return(String(st).split('.')[1]||'').length}
+function _midiLbOpen(){return!!document.getElementById('lightbox')?.classList.contains('visible')}
+function _midiNsPage(){const m=_midiMod();return!!(m&&m.nightShift)}
+// the result PRV/NXT/KEEP/TOSS/SAVE/SEND/OPEN act on: the one in the viewer, else the newest
+function _midiCurIdx(){if(_midiLbOpen()&&S.gallery[S.lbIndex])return S.lbIndex;const i=(S.gallery||[]).findIndex(g=>g&&g.type!=='3d');return i}
+function _midiRefresh(){try{if(S.view==='module'&&S.activeModule)renderModule(S.activeModule);else renderFlow()}catch(_){}}
+function _midiSlotList(){const out=[];for(const ch of CHANNELS){if(ch.id==='gallery')continue;for(const m of chanMods(ch))out.push(m.id)}return out}
+function _midiSlot(i){const id=MIDI.cfg.slots[i];if(id&&MODULES.some(m=>m.id===id))return id;return _midiSlotList()[i]||null}
+
+// ── the HUD: what just changed, big, for a second ──
+function midiHud(big,small){
+ let h=document.getElementById('midiHud');
+ if(!h){h=document.createElement('div');h.id='midiHud';h.setAttribute('role','status');document.body.appendChild(h)}
+ h.innerHTML='<b>'+escHtml(big)+'</b>'+(small?'<span>'+escHtml(small)+'</span>':'');
+ h.classList.add('show');clearTimeout(MIDI._hud);MIDI._hud=setTimeout(()=>h.classList.remove('show'),1400);
+}
+
+// ── the wheel ──
+function midiDial(cc,delta){
+ const what=MIDI_DIALS[cc];if(!what||!delta)return;
+ if(what==='batch'){
+  const L=[1,2,4];let i=L.indexOf(S.batch|0);if(i<0)i=0;i=Math.max(0,Math.min(L.length-1,i+(delta>0?1:-1)));
+  setBatch(L[i]);midiHud('BATCH ×'+L[i],'per run');return;
+ }
+ const mod=_midiMod();
+ if(!_midiPlain(mod)){midiHud(what.toUpperCase(),'Open a tool first');return}
+ let fid=what,f=_midiField(mod,fid),el=_midiEl(mod,fid);
+ if((what==='width'||what==='height')&&!el){fid='mp';f=_midiField(mod,'mp');el=_midiEl(mod,'mp')}
+ if(!f||!el){midiHud(what.toUpperCase(),'Not on '+mod.name);return}
+ const cur=parseFloat(el.value);
+ if(fid==='seed'){
+  let base=Number.isFinite(cur)&&cur>0?cur:0;
+  if(!base){const g=(S.gallery||[]).find(x=>x.meta&&x.meta.moduleId===mod.id&&x.meta.params&&+x.meta.params.seed>0);base=g?+g.meta.params.seed:rnd()}
+  const v=Math.max(1,Math.round(base+delta));_midiSet(mod,fid,v);midiHud('SEED '+v,'locked · '+mod.name);return;
+ }
+ const defs={steps:[1,1,150],cfg:[f.type==='number'?0.1:0.5,0,30],denoise:[0.05,0,1],width:[64,256,4096],height:[64,256,4096],mp:[0.25,0.25,4]}[fid]||[1,-1e9,1e9];
+ const st=(fid==='width'||fid==='height')?64:(+f.step||defs[0]);
+ const mn=f.min!=null?+f.min:defs[1],mx=f.max!=null?+f.max:defs[2];
+ const base=Number.isFinite(cur)?cur:(+f.default||mn);
+ let v=Math.max(mn,Math.min(mx,base+delta*st));const d=_midiDec(st);v=+v.toFixed(d);
+ _midiSet(mod,fid,d?v.toFixed(d):String(v));
+ midiHud(fid==='mp'?'SIZE '+v+' MP':fid.toUpperCase()+' '+(d?v.toFixed(d):v),mod.name);
+}
+
+// ── the pads ──
+function _midiAspect(mod,lab){
+ if(!_midiPlain(mod))return midiHud(lab,'Open a tool first');
+ const key=lab.replace(':','x');const a=_midiEl(mod,'aspect');
+ if(a&&[...a.options].some(o=>o.value===key)){_midiSet(mod,'aspect',key);return midiHud(lab,mod.name)}
+ const w=_midiEl(mod,'width'),h=_midiEl(mod,'height');
+ if(w&&h){
+  const [rw,rh]=lab.split(':').map(Number);const area=Math.max(256*256,(parseFloat(w.value)||1024)*(parseFloat(h.value)||1024));
+  const W=Math.max(256,Math.round(Math.sqrt(area*rw/rh)/64)*64),H=Math.max(256,Math.round(Math.sqrt(area*rh/rw)/64)*64);
+  _midiSet(mod,'width',W);_midiSet(mod,'height',H);
+  try{document.querySelectorAll('#moduleContent .chip-row .chip').forEach(c=>c.classList.toggle('active',c.textContent.includes(W+'×'+H)))}catch(_){}
+  return midiHud(lab+' · '+W+'×'+H,mod.name);
+ }
+ midiHud(lab,'No aspect setting on '+mod.name);
+}
+function _midiQuality(mod,lab){
+ if(!_midiPlain(mod))return midiHud(lab,'Open a tool first');
+ const key={DRFT:'Draft',GOOD:'Balanced',BEST:'Max'}[lab];
+ if(!(MOD_PRESETS[mod.id]||{})[key])return midiHud(lab,'No quality presets on '+mod.name);
+ applyModPreset(mod.id,key);midiHud(key.toUpperCase(),mod.name);
+}
+function _midiSeed(mod,lock){
+ if(!_midiPlain(mod))return midiHud(lock?'LOCK':'SEED','Open a tool first');
+ if(!lock&&typeof LIVE!=='undefined'&&LIVE.on&&LIVE.mod===mod.id){fxLiveNewSeed();return midiHud('NEW SEED','live · '+mod.name)}
+ const el=_midiEl(mod,'seed');if(!el)return midiHud(lock?'LOCK':'SEED','No seed on '+mod.name);
+ const cur=parseInt(el.value)||0;
+ if(!lock){const v=rnd();_midiSet(mod,'seed',v);return midiHud('SEED '+v,'locked · '+mod.name)}
+ if(cur>0){_midiSet(mod,'seed',0);return midiHud('SEED RANDOM','unlocked · '+mod.name)}
+ const g=(S.gallery||[]).find(x=>x.meta&&x.meta.moduleId===mod.id&&x.meta.params&&+x.meta.params.seed>0);
+ const v=g?+g.meta.params.seed:rnd();_midiSet(mod,'seed',v);midiHud('LOCKED '+v,(g?'your last render · ':'')+mod.name);
+}
+function _midiRun(mod){
+ if(!mod)return midiHud('RUN','Open a tool first');
+ if(_midiPlain(mod)){
+  if(typeof LIVE!=='undefined'&&LIVE.on&&LIVE.mod===mod.id&&typeof fxLiveKeep==='function'){fxLiveKeep();return midiHud('KEEP LIVE',mod.name)}
+  generateModule(mod.id);return midiHud('RUN',mod.name);
+ }
+ const run=mod.nightShift?()=>{if(!NS_RT.running)nsStart(false)}:mod.episode?epRenderAll:mod.canvas?pcRun:mod.graph?ngRun:mod.stage?stageRun:mod.liveCanvas?lcKeep:null;
+ if(!run)return midiHud('RUN','Nothing to run on '+mod.name);
+ try{run()}catch(e){showToast(e.message||'Run failed','error')}
+ midiHud('RUN',mod.name);
+}
+function _midiStop(mod){
+ if(mod&&mod.nightShift&&NS_RT.running){nsStop();return midiHud('STOP','Night Shift')}
+ if(mod&&mod.episode&&typeof epStop==='function'){try{epStop()}catch(_){}return midiHud('STOP','World Builder')}
+ if((S.queue||[]).length){qolSkip();return midiHud('STOP',(S.queue[0]&&S.queue[0].name)||'')}
+ if(S.connected){fetch(getServer()+'/interrupt',{method:'POST'}).catch(()=>{})}
+ midiHud('STOP','Nothing in the queue');
+}
+function _midiAgain(){
+ const last=S._midiLast||((S.queue||[]).slice(-1)[0]||{}).moduleId||((S.gallery||[]).find(g=>g.meta&&g.meta.moduleId)||{meta:{}}).meta.moduleId;
+ const mod=MODULES.find(m=>m.id===last);
+ if(!mod||!_midiPlain(mod))return midiHud('AGAIN','Nothing run yet');
+ if(_midiLbOpen())closeLightbox();
+ if(S.activeModule!==mod.id||S.view!=='module')selectModule(mod.id);
+ generateModule(mod.id);midiHud('AGAIN',mod.name);
+}
+// Night Shift: a cursor over the takes on screen
+function _midiNsTakes(){return[...document.querySelectorAll('#moduleContent .ns-take')].map(f=>{const b=f.querySelector('button[onclick^="nsRate("]');const m=b&&/nsRate\('([^']+)'/.exec(b.getAttribute('onclick')||'');return m?{el:f,id:m[1]}:null}).filter(Boolean)}
+function _midiNsMark(){try{_midiNsTakes().forEach(t=>{const on=t.id===MIDI.nsCur;t.el.classList.toggle('midi-cur',on);if(on&&MIDI.cfg.on)t.el.scrollIntoView({block:'nearest'})})}catch(_){}}
+function _midiNsTake(){const s=NS.session;return s&&MIDI.nsCur?(s.takes||[]).find(t=>t.id===MIDI.nsCur):null}
+function _midiNs(lab){
+ const takes=_midiNsTakes();if(!takes.length)return midiHud(lab,'No takes yet');
+ let i=takes.findIndex(t=>t.id===MIDI.nsCur);
+ if(lab==='PRV'||lab==='NXT'){i=i<0?0:Math.max(0,Math.min(takes.length-1,i+(lab==='NXT'?1:-1)));MIDI.nsCur=takes[i].id;_midiNsMark();return midiHud('TAKE '+MIDI.nsCur.toUpperCase(),(i+1)+' of '+takes.length)}
+ if(i<0){MIDI.nsCur=takes[0].id;_midiNsMark()}
+ const t=_midiNsTake();if(!t)return midiHud(lab,'Pick a take with PRV / NXT');
+ const id=t.id;
+ if(lab==='KEEP'){if(t.you!==1)nsRate(id,1);midiHud('★ KEEP','take '+id.toUpperCase())}
+ else if(lab==='TOSS'){if(t.you!==-1)nsRate(id,-1);midiHud('✕ CUT','take '+id.toUpperCase())}
+ else if(lab==='OPEN'){nsOpen(id);midiHud('OPEN','take '+id.toUpperCase())}
+ else if(lab==='SEND'){nsUse(id);midiHud('SEND','take '+id.toUpperCase()+' → its tool')}
+ else if(lab==='SAVE'){const g=t.file?S.gallery.findIndex(x=>x.filename===t.file.filename):-1;if(g>=0){downloadItem(g);midiHud('SAVE','take '+id.toUpperCase())}else midiHud('SAVE','Not rendered yet')}
+}
+function _midiResult(lab){
+ if(_midiNsPage()&&!_midiLbOpen()&&lab!=='UPSC')return _midiNs(lab);
+ const n=(S.gallery||[]).length;
+ if(lab==='PRV'||lab==='NXT'){
+  if(!n)return midiHud(lab,'No results yet');
+  if(_midiLbOpen())lbNav(lab==='NXT'?1:-1);else{const i=_midiCurIdx();if(i<0)return midiHud(lab,'No results yet');openLB(i)}
+  return midiHud(lab,(S.lbIndex+1)+' / '+S.gallery.length);
+ }
+ const i=_midiCurIdx(),it=i>=0?S.gallery[i]:null;
+ if(!it)return midiHud(lab,'No results yet');
+ if(lab==='OPEN'){if(_midiLbOpen()){closeLightbox();return midiHud('CLOSE','')}openLB(i);return midiHud('OPEN',it.filename)}
+ if(lab==='SAVE'){downloadItem(i);return midiHud('SAVE',it.filename)}
+ if(lab==='KEEP'){S.favorites=S.favorites||[];if(!isFav(it)){S.favorites.push(it.filename);_favSave();_midiRefresh()}return midiHud('★ KEPT',it.filename)}
+ if(lab==='TOSS'){
+  S.favorites=S.favorites||[];const fi=S.favorites.indexOf(it.filename);if(fi>=0){S.favorites.splice(fi,1);_favSave()}
+  S.gallery.splice(i,1);updateGenCount();try{saveState()}catch(_){}
+  if(_midiLbOpen()){if(S.gallery.length){const j=Math.min(i,S.gallery.length-1);openLB(j)}else closeLightbox()}
+  _midiRefresh();
+  return midiHud('TOSSED','off the list · the file stays on disk');
+ }
+ if(lab==='SEND'||lab==='UPSC'){
+  if(it.type!=='image')return midiHud(lab,'Pictures only');
+  let target;
+  if(lab==='UPSC'){const ups=MODULES.filter(m=>m.category==='upscale'&&m.requiresImage);target=ups.find(m=>m.id==='up-seedvr2'&&!isHidden(m.id))||ups.find(m=>!isHidden(m.id))||ups[0]}
+  else{const m=MODULES.find(x=>x.id===S.activeModule);target=canTakeImage(m)?m:null}
+  if(!target)return midiHud('SEND','Open a tool that takes a picture first');
+  if(_midiLbOpen())closeLightbox();
+  useAsSource(i,target.id);return midiHud(lab==='UPSC'?'UPSCALE':'SEND','→ '+target.name);
+ }
+}
+function _midiLook(n){
+ const mod=_midiMod();if(!_midiPlain(mod))return midiHud('S'+n,'Open a tool first');
+ const pinned=_looksFor(mod).filter(s=>s.pin);const s=pinned[n-1];
+ if(!s)return midiHud('S'+n,pinned.length?'Only '+pinned.length+' pinned looks fit '+mod.name:'Pin looks in the Prompt Lab');
+ toggleStyle(s.id);midiHud((s.on?'ON ':'OFF ')+s.name.toUpperCase(),'look S'+n);
+}
+function midiPad(note){
+ const lab=MIDI_PADS[note];if(!lab)return;
+ const mod=_midiMod();
+ switch(lab){
+  case 'RUN':return _midiRun(mod);
+  case 'STOP':return _midiStop(mod);
+  case 'CLR':if((S.queue||[]).length||S.generating){cancelGeneration();return midiHud('CLEAR','queue cleared')}return midiHud('CLEAR','The queue is empty');
+  case 'AGN':return _midiAgain();
+  case 'SEED':return _midiSeed(mod,false);
+  case 'LOCK':return _midiSeed(mod,true);
+  case 'B1':setBatch(1);return midiHud('BATCH ×1','per run');
+  case 'B4':setBatch(4);return midiHud('BATCH ×4','per run');
+  case 'PRV':case 'NXT':case 'KEEP':case 'TOSS':case 'SAVE':case 'SEND':case 'OPEN':case 'UPSC':return _midiResult(lab);
+  case 'HOME':if(_midiLbOpen())closeLightbox();goIndex(true);return midiHud('HOME','index');
+  case '1:1':case '16:9':case '9:16':case '4:3':return _midiAspect(mod,lab);
+  case 'DRFT':case 'GOOD':case 'BEST':return _midiQuality(mod,lab);
+ }
+ if(lab[0]==='W'){const i=+lab.slice(1)-1;const id=_midiSlot(i);const m=id&&MODULES.find(x=>x.id===id);if(!m)return midiHud(lab,'Empty slot');if(_midiLbOpen())closeLightbox();selectModule(m.id);return midiHud(lab,m.name)}
+ if(lab[0]==='S')return _midiLook(+lab.slice(1));
+}
+
+// ── incoming bytes ──
+function midiHandle(data){
+ if(!data||data.length<2)return;
+ const st=data[0]&0xF0,ch=data[0]&0x0F,d1=data[1],d2=data.length>2?data[2]:0;
+ if(ch!==0)return; // the HUB deck's one page = channel 1
+ if(st===0x90&&d2>0){
+  // the deck's pads hit at velocity 100; velocity 127 is the MIXER deck's Mackie buttons — not for us
+  if(d2===127||d1>=48)return;
+  _midiSeen('NOTE '+d1+' · '+MIDI_PADS[d1]);
+  try{midiPad(d1)}catch(e){console.warn('[i2 MIDI]',e)}
+ }else if(st===0xB0&&d1>=1&&d1<=7){
+  const delta=d2-64;if(!delta)return;
+  _midiSeen('CC '+d1+' '+(delta>0?'+':'')+delta+' · '+MIDI_DIALS[d1].toUpperCase());
+  try{midiDial(d1,delta)}catch(e){console.warn('[i2 MIDI]',e)}
+ }
+}
+function _midiSeen(txt){MIDI.last=txt;MIDI.lastAt=Date.now();_midiPaint(true)}
+
+// ── ports ──
+function _midiInputs(){const a=[];try{if(MIDI.access)MIDI.access.inputs.forEach(p=>a.push(p))}catch(_){}return a}
+function _midiPick(){
+ const ins=_midiInputs().filter(p=>p.state!=='disconnected');
+ const want=MIDI.cfg.port;
+ const pick=want?ins.find(p=>p.name===want):ins.find(p=>MIDI_PORT_RE.test(p.name||''));
+ if(MIDI.input&&MIDI.input!==pick){try{MIDI.input.onmidimessage=null}catch(_){}}
+ MIDI.input=pick||null;
+ if(MIDI.input)MIDI.input.onmidimessage=e=>midiHandle(e.data);
+ MIDI.state=MIDI.input?'on':'wait';
+ _midiPaint();
+}
+async function midiStart(){
+ MIDI.err='';
+ if(typeof navigator.requestMIDIAccess!=='function'){
+  MIDI.state='error';MIDI.err=window.isSecureContext===false?'Web MIDI needs the hub opened as a file or from localhost.':'This browser has no Web MIDI. Use Chrome or Edge (Safari and Firefox can’t do it here).';
+  _midiPaint();return false;
+ }
+ MIDI.state='asking';_midiPaint();
+ try{
+  const acc=await navigator.requestMIDIAccess({sysex:false});
+  if(!MIDI.cfg.on){return false} // switched off while the browser was asking
+  MIDI.access=acc;acc.onstatechange=()=>{if(MIDI.access===acc)_midiPick()};
+  _midiPick();return true;
+ }catch(e){
+  MIDI.state='error';
+  MIDI.err=/Security|NotAllowed|denied/i.test((e&&(e.name+' '+e.message))||'')?'MIDI was blocked. Allow MIDI devices for this page in the browser’s site settings (the icon left of the address), then turn it on again.':'Couldn’t open MIDI: '+((e&&e.message)||e);
+  _midiPaint();return false;
+ }
+}
+function midiStop(){
+ if(MIDI.input){try{MIDI.input.onmidimessage=null;MIDI.input.close&&MIDI.input.close().catch(()=>{})}catch(_){}}
+ if(MIDI.access){try{MIDI.access.onstatechange=null}catch(_){}}
+ MIDI.input=null;MIDI.access=null;MIDI.state='off';MIDI.err='';_midiPaint();
+}
+function midiToggle(){
+ MIDI.cfg.on=!MIDI.cfg.on;_midiSave();
+ if(MIDI.cfg.on)midiStart().then(ok=>{if(ok)showToast(MIDI.input?'MIDI on — '+MIDI.input.name:'MIDI on — waiting for the Tracker','success')});
+ else{midiStop();showToast('MIDI off','')}
+}
+function midiSetPort(v){MIDI.cfg.port=v||'';_midiSave();_midiPick()}
+function midiSetSlot(i,v){MIDI.cfg.slots[i]=v||'';while(MIDI.cfg.slots.length&&!MIDI.cfg.slots[MIDI.cfg.slots.length-1])MIDI.cfg.slots.pop();_midiSave();_midiPaint()}
+
+// ── the header light + the Settings card ──
+function _midiPill(){
+ let p=document.getElementById('midiPill');
+ if(!MIDI.cfg.on){if(p)p.style.display='none';return}
+ if(!p){const sr=document.querySelector('#stagebar .stage-right');if(!sr)return;p=document.createElement('button');p.className='hb midi-pill';p.id='midiPill';p.onclick=()=>selectModule('asset-settings');sr.insertBefore(p,document.getElementById('statusPill'));}
+ p.style.display='';
+ const st=MIDI.state;p.classList.toggle('on',st==='on');p.classList.toggle('err',st==='error');
+ p.innerHTML='<span class="mp-dot"></span>MIDI';
+ p.title=st==='on'?('MIDI: '+MIDI.input.name+(MIDI.last?' · last: '+MIDI.last:'')):st==='error'?('MIDI: '+MIDI.err):'MIDI: waiting for the Tracker';
+}
+function _midiPaint(blink){
+ _midiPill();
+ if(blink){const p=document.getElementById('midiPill');if(p){p.classList.remove('blink');void p.offsetWidth;p.classList.add('blink')}}
+ const c=document.getElementById('midiCard');if(c){if(blink){const l=document.getElementById('midiLast');if(l){l.textContent=MIDI.last;return}}c.innerHTML=_midiCardBody()}
+}
+function _midiCard(){return '<div id="midiCard" class="midi-card">'+_midiCardBody()+'</div>'}
+function _midiCardBody(){
+ const on=MIDI.cfg.on,st=MIDI.state;
+ const stat=!on?'Off':st==='on'?'● Listening to <b>'+escHtml(MIDI.input.name)+'</b>':st==='asking'?'Asking the browser…':st==='error'?'<span class="midi-err">'+escHtml(MIDI.err)+'</span>':'○ Waiting for the Tracker — plug it in, or pick an input below';
+ let h='<div class="midi-head"><div><div class="midi-t">MIDI controller (i2 DECK)</div><div class="midi-d">Drive the hub from a Polyend Tracker running i2 DECK: open the <b>HUB</b> deck and its pads and wheel run the hub over USB MIDI. Chrome or Edge. Input only; nothing is sent anywhere.</div></div>'+
+  '<button class="midi-onoff'+(on?' on':'')+'" id="midiToggle" onclick="midiToggle()">'+(on?'ON':'OFF')+'</button></div>';
+ h+='<div class="midi-stat" id="midiStat">'+stat+'</div>';
+ if(on&&MIDI.access){
+  const ins=_midiInputs();
+  h+='<div class="midi-row"><label class="form-label" for="midiPort">Input</label><select class="form-select" id="midiPort" onchange="midiSetPort(this.value)"><option value="">Auto (finds the Tracker)</option>'+
+   ins.map(p=>'<option value="'+escAttr(p.name)+'"'+(MIDI.cfg.port===p.name?' selected':'')+'>'+escHtml(p.name)+(p.state==='disconnected'?' (unplugged)':'')+'</option>').join('')+
+   (MIDI.cfg.port&&!ins.some(p=>p.name===MIDI.cfg.port)?'<option value="'+escAttr(MIDI.cfg.port)+'" selected>'+escHtml(MIDI.cfg.port)+' (not plugged in)</option>':'')+'</select></div>';
+  h+='<div class="midi-last">Last message: <span id="midiLast">'+escHtml(MIDI.last||'none yet')+'</span></div>';
+ }
+ const auto=_midiSlotList(),opts=MODULES.filter(m=>!m.isSettings&&!m.guide);
+ h+='<details class="midi-more"><summary>Workflow slots W1–W16</summary><p class="midi-d">Which tool each W pad opens. Auto follows the channel guide order.</p><div class="midi-slots">'+
+  Array.from({length:16},(_,i)=>{const cur=MIDI.cfg.slots[i]||'';const a=MODULES.find(m=>m.id===auto[i]);
+   return '<label><span>W'+(i+1)+'</span><select class="form-select" onchange="midiSetSlot('+i+',this.value)"><option value="">Auto'+(a?' — '+escHtml(a.name):'')+'</option>'+opts.map(m=>'<option value="'+escAttr(m.id)+'"'+(m.id===cur?' selected':'')+'>'+escHtml(m.name)+'</option>').join('')+'</select></label>'}).join('')+'</div></details>';
+ h+='<details class="midi-more"><summary>What each pad does</summary><dl class="midi-map">'+MIDI_HELP.map(([k,v])=>'<dt>'+escHtml(k)+'</dt><dd>'+escHtml(v)+'</dd>').join('')+'</dl></details>';
+ return h;
+}
+// keep the Night Shift cursor through re-renders
+{const _r=renderNightShift;renderNightShift=function(){const r=_r.apply(this,arguments);if(MIDI.cfg.on)_midiNsMark();return r}}
+// remember the last tool run, for AGN
+{const _g=generateModule;generateModule=function(id){S._midiLast=id;return _g.apply(this,arguments)}}
+if(MIDI.cfg.on)midiStart();
+
 </script>
 <style>
 .prompt-lab{margin:0 0 10px;border:1px solid var(--border-subtle);background:var(--bg-raise);padding:8px 10px}
@@ -8655,6 +8991,44 @@ body.scrubbing,body.scrubbing *{cursor:ew-resize !important;user-select:none !im
 .cam-say{margin:0;font-size:13px;color:var(--tt-white)}
 .cam-side .lab-link{margin:0;align-self:flex-start}
 @media (max-width:760px){.cam{grid-template-columns:1fr}.cam-ring{justify-self:center}}
+</style>
+
+<style id="x122">
+/* 1.22 — MIDI controller (i2 DECK HUB deck): header light, HUD, Settings card */
+.midi-pill{gap:7px;color:var(--tt-dim)}
+.midi-pill .mp-dot{width:7px;height:7px;border-radius:50%;border:1px solid var(--tt-dim);display:inline-block}
+.midi-pill.on{color:var(--tt-white)}
+.midi-pill.on .mp-dot{background:var(--tt-green);border-color:var(--tt-green)}
+.midi-pill.err .mp-dot{background:var(--tt-red);border-color:var(--tt-red)}
+.midi-pill.blink .mp-dot{animation:midiBlink .35s ease}
+@keyframes midiBlink{0%{background:var(--tt-yellow);border-color:var(--tt-yellow);box-shadow:0 0 8px var(--tt-yellow)}100%{}}
+#midiHud{position:fixed;left:50%;bottom:64px;transform:translateX(-50%);z-index:450;background:#000;border:1px solid var(--tt-line2);border-left:3px solid var(--tt-green);padding:10px 18px 9px;min-width:180px;text-align:center;pointer-events:none;opacity:0;transition:opacity .15s}
+#midiHud.show{opacity:1}
+#midiHud b{display:block;font-family:var(--px);font-weight:700;font-size:26px;line-height:1.1;color:var(--tt-green);letter-spacing:.02em;white-space:nowrap}
+#midiHud span{display:block;font-size:12px;color:var(--tt-dim);margin-top:3px;max-width:60vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.midi-card{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;display:flex;flex-direction:column;gap:10px}
+.midi-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.midi-t{font-weight:600;font-size:13px;margin-bottom:4px}
+.midi-d{font-size:11px;color:var(--text-tertiary);margin:0}
+.midi-onoff{flex:none;background:var(--bg-panel);border:1px solid var(--border);color:var(--text-secondary);font-size:11px;font-weight:700;padding:8px 16px;border-radius:4px;cursor:pointer;font-family:var(--font-ui)}
+.midi-onoff.on{background:rgba(77,216,192,0.15);border-color:var(--accent-primary);color:var(--accent-primary)}
+.midi-stat{font-size:12px;color:var(--text-secondary)}
+.midi-stat b{color:var(--tt-white)}
+.midi-err{color:var(--tt-red)}
+.midi-row{display:flex;flex-direction:column;gap:4px;max-width:420px}
+.midi-last{font-size:11px;color:var(--text-tertiary)}
+.midi-last span{font-family:var(--code);color:var(--tt-green)}
+.midi-more summary{cursor:pointer;font-size:12px;color:var(--text-secondary)}
+.midi-more[open] summary{margin-bottom:8px}
+.midi-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px 12px;margin-top:8px}
+.midi-slots label{display:flex;align-items:center;gap:8px}
+.midi-slots span{font-family:var(--px);font-size:12px;width:30px;flex:none;color:var(--tt-dim)}
+.midi-slots .form-select{padding:6px 28px 6px 9px !important;font-size:13px !important}
+.midi-map{display:grid;grid-template-columns:max-content 1fr;gap:5px 14px;margin:0;font-size:12px}
+.midi-map dt{font-family:var(--px);color:var(--tt-white);white-space:nowrap}
+.midi-map dd{margin:0;color:var(--text-secondary)}
+.ns-take.midi-cur{outline:2px solid var(--tt-yellow);outline-offset:3px}
+@media (max-width:760px){#midiHud{bottom:84px}.midi-head{flex-direction:column}}
 </style>
 
 </body>

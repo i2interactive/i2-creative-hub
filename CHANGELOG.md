@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.22.0
+
+- MIDI controller: a Polyend Tracker running i2 DECK drives the hub from its HUB deck. Run, stop, clear, seeds, batch, results (step, keep, toss, save, send, upscale), 16 tool slots, aspect, quality presets and pinned looks on the pads; steps, CFG, denoise, seed, size and batch on the wheel, with an on-screen readout. Off until you turn it on in Settings; Chrome or Edge. Full map in [docs/MIDI.md](docs/MIDI.md).
+
 ## 1.21.1 (first public release)
 
 - Opens with a Starter lineup of 25 tools; the rest are in Settings › Module Library.

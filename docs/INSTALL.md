@@ -1,6 +1,6 @@
 # Install guide
 
-This gets the i2 interactive Creative Hub (1.21.1) running against your own ComfyUI. Plan on about an hour, most of it downloading models. You only need the models for the tools you use: every tool has a **Check my install** button that lists exactly what it's missing.
+This gets the i2 interactive Creative Hub (1.22.0) running against your own ComfyUI. Plan on about an hour, most of it downloading models. You only need the models for the tools you use: every tool has a **Check my install** button that lists exactly what it's missing.
 
 ## 1. What you need
 
@@ -8,6 +8,7 @@ This gets the i2 interactive Creative Hub (1.21.1) running against your own Comf
 - **ComfyUI 0.40 or newer** (portable, desktop or a git install). 0.37 is the minimum for Qwen Image 2.1; older versions lose a few tools, and the hub's front page names which.
 - **Chrome or Edge.**
 - Optional: **LM Studio** for the i2 Agent, Night Shift, Enhance, Variations and Breed.
+- Optional: a **Polyend Tracker running i2 DECK**, to drive the hub over USB MIDI. Setup and the full map: [MIDI.md](MIDI.md).
 
 ## 2. Start ComfyUI so the hub can reach it
 
