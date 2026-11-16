@@ -1241,7 +1241,7 @@ async function agentExec(name,args){
 }
 
 function agentSys(){
-  return 'You are the i2 Agent, the operator inside the i2 Interactive Creative Hub \u2014 a control panel for a local ComfyUI. '
+  return 'You are the i2 Agent, the operator inside the i2 interactive Creative Hub \u2014 a control panel for a local ComfyUI. '
   +'You have tools. USE THEM: never guess module ids, control names, node classes or model filenames \u2014 look them up. '
   +'Current context: ComfyUI '+(S.connected?'connected':'NOT connected')+'; active module: '+(S.activeModule||'none')+'. '
   +'When the user wants settings changed, call set_controls so they see the knobs move, then confirm briefly. '
@@ -4335,7 +4335,7 @@ function fxDisclosure(item){
   const made=models.length?models.join(' + '):(mod?mod.name:'a local model');
   const pr=String(p.prompt||'').trim();
   const date=new Date(c.at||Date.now()).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});
-  return 'AI-generated '+what+'. Made with '+made+(loras.length?' + LoRA '+loras.join(', '):'')+' in ComfyUI, run locally with i2 Interactive Creative Hub'+(c.hub?' '+c.hub:'')+'. '+
+  return 'AI-generated '+what+'. Made with '+made+(loras.length?' + LoRA '+loras.join(', '):'')+' in ComfyUI, run locally with i2 interactive Creative Hub'+(c.hub?' '+c.hub:'')+'. '+
     (pr?'Prompt: \u201c'+(pr.length>220?pr.slice(0,217)+'\u2026':pr)+'\u201d. ':'')+(p.seed?'Seed '+p.seed+'. ':'')+date+'.';
 }
 function fxCopyDisclosure(idx){const it=_fxItem(idx);if(!it)return;const t=fxDisclosure(it);
@@ -4348,7 +4348,7 @@ async function fxSaveCredits(idx){
   const man={credits:'i2 credits v1',ai_generated:true,
     file:{name:it.filename,type:it.type,sha256:sha||null},
     made:c.at?new Date(c.at).toISOString():null,
-    tool:'i2 Interactive Creative Hub'+(c.hub?' '+c.hub:''),engine:'ComfyUI'+(c.comfy?' '+c.comfy:''),run:'local',
+    tool:'i2 interactive Creative Hub'+(c.hub?' '+c.hub:''),engine:'ComfyUI'+(c.comfy?' '+c.comfy:''),run:'local',
     module:mod?mod.name:(it.meta&&it.meta.moduleId)||null,models:c.models||[],
     prompt:(it.meta&&it.meta.params&&it.meta.params.prompt)||null,settings:(it.meta&&it.meta.params)||null,
     lineage:(it.meta&&it.meta.lineage)||null,disclosure:fxDisclosure(it)};
