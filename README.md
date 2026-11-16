@@ -24,7 +24,7 @@ No install, no account, no server of its own. It's one HTML file that talks to t
 
 1. Install or update [ComfyUI](https://github.com/comfyanonymous/ComfyUI) (0.40 or newer recommended).
 2. Start ComfyUI with the `--enable-cors-header` flag. The hub can't connect without it.
-3. Download `i2-creative-hub.html` from this repo and open it in Chrome or Edge.
+3. Download `i2-creative-hub.html` from the [latest release](https://github.com/i2interactive/i2-creative-hub/releases/latest) and open it in Chrome or Edge.
 4. Click **OFFLINE** at the top right, check the address (default `http://127.0.0.1:8188`) and link it.
 5. Open any tool and press **Check my install**. It tells you exactly which models and node packs that tool needs and where each file goes.
 
