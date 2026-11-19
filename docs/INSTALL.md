@@ -1,6 +1,6 @@
 # Install guide
 
-This gets the i2 interactive Creative Hub (1.22.0) running against your own ComfyUI. Plan on about an hour, most of it downloading models. You only need the models for the tools you use: every tool has a **Check my install** button that lists exactly what it's missing.
+This gets the i2 interactive Creative Hub (1.23.0) running against your own ComfyUI. Plan on about an hour, most of it downloading models. You only need the models for the tools you use. **Settings › Downloads › Find what's missing** lists what your active tools still need and downloads it for you; every tool's **Check my install** does the same for that tool.
 
 ## 1. What you need
 
@@ -30,7 +30,9 @@ Also useful: `--preview-method auto` shows step previews in the hub's monitor wh
 
 ## 4. Node packs
 
-Most tools use only nodes that ship with ComfyUI. These need a custom node pack. Install them from **ComfyUI Manager** (search the name), restart ComfyUI, then press **Re-check install** in Settings.
+Most tools use only nodes that ship with ComfyUI. These need a custom node pack. With [ComfyUI Manager](https://github.com/Comfy-Org/ComfyUI-Manager) installed (3.x, or 4.x; newer ComfyUI ships it behind `--enable-manager`), press **Install** next to a missing pack anywhere in the hub, then **Restart ComfyUI** in the Downloads box at the bottom left. Without the Manager, install them by hand (search the name in ComfyUI Manager, or clone the GitHub link) and press **Re-check install** in Settings.
+
+ComfyUI Manager only installs packs from its own list at its default security level. For a pack that isn't in it (like the Spectrum speed-up), the hub gives you the link to paste into Manager › Install via Git URL.
 
 | Pack (search in ComfyUI Manager) | Needed for | Notes |
 | --- | --- | --- |
@@ -46,7 +48,11 @@ If a tool needs a node you don't have, the hub stops before anything is queued a
 
 ## 5. Models
 
-Put each file in the folder shown, inside your ComfyUI folder (for example `ComfyUI/models/diffusion_models`). After adding files, press **Re-check install** in Settings (or reconnect) and they show up.
+**The quick way:** press **Download** next to a missing file (or **Download all**). The first time, Chrome or Edge asks you to pick a folder: choose ComfyUI's `models` folder (picking the ComfyUI folder itself works too). Each file is saved straight into the right subfolder, with progress in the Downloads box at the bottom left, and the hub picks it up as soon as it finishes; ComfyUI doesn't need a restart. A half-finished download never leaves a broken file behind. Files that ComfyUI Manager has in its own list can also download through the Manager when no folder is linked, which is handy when ComfyUI runs on another machine.
+
+**By hand:** press **browser ↓** (or use the links below), then put each file in the folder shown, inside your ComfyUI folder (for example `ComfyUI/models/diffusion_models`). After adding files, press **Re-check install** in Settings (or reconnect) and they show up.
+
+A few files need a sign-in or a licence click on Hugging Face first; Download says so, and **browser ↓** opens the page.
 
 Most links go to the official Comfy-Org repackaged files. Where a tool offers variants (bf16 or int8, for example), you only need the one you pick.
 
@@ -149,7 +155,10 @@ Tips:
 ## 7. Troubleshooting
 
 - **The status stays red.** Check that ComfyUI is running, the address matches, and you started it with `--enable-cors-header`.
-- **"Model not found".** Press **Check my install** on that tool. It names the file and the folder it goes in.
+- **"Model not found".** Press **Check my install** on that tool, then **Download**. It names the file and the folder it goes in.
+- **Download says it couldn't reach the file.** The file may need a Hugging Face sign-in or licence click. Use **browser ↓**, then move the file into the folder shown.
+- **Install says ComfyUI Manager's security setting blocks it.** The pack isn't in the Manager's list. Use **Copy link** and Manager › Install via Git URL, or set `security_level = normal-` in the Manager's `config.ini`.
+- **Downloads went to the wrong place.** Settings › Downloads › Models folder › **change**, and pick ComfyUI's `models` folder.
 - **Out of memory.** Turn on **Low VRAM** mode in Settings, lower the size or steps, or use the int8 variant. When a render runs out of memory, the hub offers to free VRAM and retry.
 - **A tool needs a newer ComfyUI.** The front page lists which tools need which version. Update, then press **Re-check install**.
 - **RTX nodes won't load.** The Nvidia VFX pack needs a CUDA 13 build of PyTorch in the same Python that runs ComfyUI.

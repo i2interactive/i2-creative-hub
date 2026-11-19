@@ -14,6 +14,7 @@ No install, no account, no server of its own. It's one HTML file that talks to t
 - **World Builder.** Set up a world once (people, places, look, rules), break a script into shots, render chained video takes with sound, assemble one file, or export the timeline as XML for Premiere or Resolve.
 - **Night Shift.** Leave a brief before bed. Your local LLM writes prompts, renders takes, looks at them, scores them against the brief and steers the next round. You wake up to ranked dailies.
 - **i2 Agent.** Talk to a local LLM (LM Studio) and it checks your models, sets the knobs and runs the job.
+- **One-click downloads.** Missing model files download straight into ComfyUI's models folder, and missing node packs install through ComfyUI Manager, from the same screen that says they're missing. Settings › Downloads › **Find what's missing** checks every active tool at once.
 - **Template Import.** ComfyUI's own template library, inside the hub. Pick a template, see which model files you're missing, and turn it into a hub tool. New models usually land there on release day.
 - **NVIDIA RTX video tools.** Instant upscale, denoise, deblur and SDR-to-HDR on your RTX card.
 - **Built for 8GB cards.** Developed on an RTX 3070 Ti. Low VRAM mode, an out-of-memory rescue, and automatic fast drafts help on smaller cards.
@@ -26,7 +27,9 @@ No install, no account, no server of its own. It's one HTML file that talks to t
 2. Start ComfyUI with the `--enable-cors-header` flag. The hub can't connect without it.
 3. Download `i2-creative-hub.html` from the [latest release](https://github.com/i2interactive/i2-creative-hub/releases/latest) and open it in Chrome or Edge.
 4. Click **OFFLINE** at the top right, check the address (default `http://127.0.0.1:8188`) and link it.
-5. Open any tool and press **Check my install**. It tells you exactly which models and node packs that tool needs and where each file goes.
+5. Go to **Settings › Downloads › Find what's missing**. Press **Download all** for the models (the first time, pick ComfyUI's `models` folder) and **Install all** for the node packs (needs ComfyUI Manager), then **Restart ComfyUI** if it asks.
+
+Any tool's **Check my install** shows the same buttons for just that tool.
 
 The full walkthrough, including node packs, every model file and LM Studio setup, is in [docs/INSTALL.md](docs/INSTALL.md).
 
@@ -101,6 +104,7 @@ The hub opens with a **Starter** lineup: one strong tool per job. Everything els
 - **An NVIDIA GPU.** 8GB works for most tools; 12GB or more is more comfortable for video. The RTX tools need an RTX card, and RTX frame generation needs a 40-series or newer.
 - **32GB of system RAM** recommended for video and 3D.
 - **Chrome or Edge.**
+- **ComfyUI Manager** (optional) to install missing node packs from the hub.
 - **LM Studio** (optional) for the i2 Agent, Night Shift, prompt Enhance and Variations.
 
 ## Privacy
@@ -109,6 +113,7 @@ Everything runs on your machine. The hub has no accounts, no analytics and no se
 
 - your ComfyUI (renders, model lists, uploads),
 - your LM Studio, if you use the agent features,
+- the model host (mostly Hugging Face), when you press Download on a missing model; the file is saved into the models folder you linked,
 - ComfyUI's public template list on GitHub, when you open the template library and your ComfyUI doesn't serve it,
 - jsDelivr, to load the 3D viewer library when you open a 3D result.
 
