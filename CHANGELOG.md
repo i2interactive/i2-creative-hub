@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.24.0
+
+- A living background in place of flat black. **Flow** is a slow field that takes the colour of the channel you're on, bends around your pointer, quickens a little while you type or render, and blooms when a render lands. It draws at a fraction of screen size, drops to 15 fps during renders and 10 when you're idle, and stops when the tab is hidden; on an RTX 3070 Ti a Z-Image render took 6.7 s with it on and 6.4 s with it off (within run-to-run noise).
+- **Image** backgrounds: choose a picture, use your latest render, drop an image on Settings › Background, or press **Set as background** on any render in the viewer. Dim, blur, slow drift and a touch of Flow on top. Pictures stay in the browser and are scaled to 2560 px.
+- Panels turn to smoked glass over the background; **Panels** sets how solid they are. **Black** brings back the old look.
+- The models-folder picker now says so when it can't open, instead of doing nothing.
+
 ## 1.23.0
 
 - Download buttons for missing models. Wherever the hub says a model file is missing (Missing Model, Workflow Rejected, Check my install, the template library), **Download** saves it straight into ComfyUI's models folder, in the right subfolder, with progress, cancel and **Download all**. Pick the models folder once (Chrome or Edge); ComfyUI sees the file without a restart. **browser ↓** still saves through the browser.

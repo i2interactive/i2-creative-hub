@@ -1,6 +1,6 @@
 # Install guide
 
-This gets the i2 interactive Creative Hub (1.23.0) running against your own ComfyUI. Plan on about an hour, most of it downloading models. You only need the models for the tools you use. **Settings › Downloads › Find what's missing** lists what your active tools still need and downloads it for you; every tool's **Check my install** does the same for that tool.
+This gets the i2 interactive Creative Hub (1.24.0) running against your own ComfyUI. Plan on about an hour, most of it downloading models. You only need the models for the tools you use. **Settings › Downloads › Find what's missing** lists what your active tools still need and downloads it for you; every tool's **Check my install** does the same for that tool.
 
 ## 1. What you need
 

@@ -14,6 +14,7 @@ No install, no account, no server of its own. It's one HTML file that talks to t
 - **World Builder.** Set up a world once (people, places, look, rules), break a script into shots, render chained video takes with sound, assemble one file, or export the timeline as XML for Premiere or Resolve.
 - **Night Shift.** Leave a brief before bed. Your local LLM writes prompts, renders takes, looks at them, scores them against the brief and steers the next round. You wake up to ranked dailies.
 - **i2 Agent.** Talk to a local LLM (LM Studio) and it checks your models, sets the knobs and runs the job.
+- **A background that moves.** Settings › Background: Flow (a slow field in the colour of the channel you're on, reacting to what you do), an Image (any picture or one of your renders), or plain Black.
 - **One-click downloads.** Missing model files download straight into ComfyUI's models folder, and missing node packs install through ComfyUI Manager, from the same screen that says they're missing. Settings › Downloads › **Find what's missing** checks every active tool at once.
 - **Template Import.** ComfyUI's own template library, inside the hub. Pick a template, see which model files you're missing, and turn it into a hub tool. New models usually land there on release day.
 - **NVIDIA RTX video tools.** Instant upscale, denoise, deblur and SDR-to-HDR on your RTX card.
