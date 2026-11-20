@@ -6,6 +6,11 @@
 - **Image** backgrounds: choose a picture, use your latest render, drop an image on Settings › Background, or press **Set as background** on any render in the viewer. Dim, blur, slow drift and a touch of Flow on top. Pictures stay in the browser and are scaled to 2560 px.
 - Panels turn to smoked glass over the background; **Panels** sets how solid they are. **Black** brings back the old look.
 - The models-folder picker now says so when it can't open, instead of doing nothing.
+- Fixed: tools were blocked with "Missing models" when the files were installed. The pre-render check compared some loaders against another loader's list (CLIPVisionLoader against text encoders, MoGe against upscalers), which stopped 3D Model on a working install.
+- Fixed: Frame Interpolation picked a checkpoint (an LTX video model) as its interpolation model, because its list came from a guess on the field name. It now reads its own loader's list.
+- Fixed: Stitch / Grid was rejected by current ComfyUI. Images loaded from the output folder now carry the `[output]` tag it needs.
+- Fixed: Looks were added to the Describe tools' instruction (Qwen3-VL, Gemma), so they described a "streetwear poster" or refused. Looks now only touch image, video and audio prompts.
+- Gemma 4 Vision writes up to 512 tokens by default (was 2048, which took over 10 minutes on 8 GB).
 
 ## 1.23.0
 
