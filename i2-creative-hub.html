@@ -1024,7 +1024,7 @@ const BRAND={
   name:'i2 interactive Creative Hub',         // browser tab + about
   title:'interactive creative hub',           // boot-screen subtitle
   credit:'Made by Ian × Claude',              // footer / about line
-  version:'1.23.0',                            // shown in the connection panel + logo tooltip
+  version:'1.24.0',                            // shown in the connection panel + logo tooltip
   accent:'',                                  // '' = default teal; or a hex like '#4DD8C0'
   server:''                                   // '' = use the built-in default; or 'http://gpu-host:8188'
 };
@@ -8153,7 +8153,7 @@ async function _dlLooksLikeModels(d){for(const n of _DL_KNOWN)if(await _dlHasDir
 async function dlLinkFolder(){
  if(typeof window.showDirectoryPicker!=='function'){showToast('This browser can’t save into folders. Use Chrome or Edge, or the “browser ↓” links.','error');return null}
  showToast('Pick ComfyUI’s models folder — downloads go straight into it','info');
- let h;try{h=await window.showDirectoryPicker({id:'i2-comfy-models',mode:'readwrite'})}catch(e){return null}
+ let h;try{h=await window.showDirectoryPicker({id:'i2-comfy-models',mode:'readwrite'})}catch(e){if(e&&e.name!=='AbortError')showToast('The folder picker didn’t open here ('+(e.message||e.name)+'). Use “browser ↓”.','error');return null}
  try{
   if(!await _dlLooksLikeModels(h)){
    for(const p of [['models'],['ComfyUI','models']]){let d=h,ok=true;for(const n of p){try{d=await d.getDirectoryHandle(n)}catch(_){ok=false;break}}if(ok&&await _dlLooksLikeModels(d)){h=d;break}}
@@ -8510,6 +8510,162 @@ async function dlOpenMissing(){
 // look for the Manager each time the hub links to ComfyUI
 {const _c=connectToComfyUI;connectToComfyUI=async function(){const r=await _c.apply(this,arguments);if(S.connected){DL.mgr=undefined;DL._instFor=null;dlMgr(true)}return r}}
 _dlLoadDir();
+
+// ════════════════════════════════════════════════════════════════
+//  1.24 — LIVING BACKGROUND + IMAGE BACKGROUNDS
+//  Flow: a slow WebGL field tinted by the channel you're on. It drifts with the
+//  pointer, quickens while you work or render, and blooms when a render lands.
+//  Drawn at a fraction of screen size and capped in frame rate so it costs the
+//  GPU next to nothing; stops when the tab is hidden. Image: any picture or a
+//  render behind the panels, with dim, blur, drift and a little flow on top.
+// ════════════════════════════════════════════════════════════════
+const BG={cfg:{mode:'flow',intensity:.6,speed:.5,react:true,glass:.62,dim:.55,blur:6,drift:true,mix:.25},gl:null,cv:null,raf:0,t:0,last:0,energy:0,eT:0,pulse:0,mx:.5,my:.5,tmx:.5,tmy:.5,col:null,tcol:null,idle:0,imgUrl:null};
+try{Object.assign(BG.cfg,JSON.parse(localStorage.getItem('i2hub.bg')||'{}'))}catch(_){}
+function bgSave(){try{localStorage.setItem('i2hub.bg',JSON.stringify(BG.cfg))}catch(_){}}
+const _bgReduce=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+// channel colours, darkened; three per channel so the field has depth
+const BG_PAL={image:['#19D36B','#3B62FF','#FFD60A'],agent:['#19D36B','#3B62FF','#F2F2EE'],prompt:['#FFD60A','#FF3D3D','#3B62FF'],audio:['#FFD60A','#FF3D3D','#19D36B'],prep:['#FFD60A','#19D36B','#3B62FF'],video:['#FF3D3D','#FFD60A','#3B62FF'],upscale:['#3B62FF','#19D36B','#F2F2EE'],'3d':['#3B62FF','#FF3D3D','#19D36B'],pipeline:['#F2F2EE','#3B62FF','#19D36B'],assets:['#F2F2EE','#FFD60A','#3B62FF'],index:['#3B62FF','#19D36B','#FF3D3D']};
+const _bgHex=h=>{const n=parseInt(h.slice(1),16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]};
+function _bgTarget(){const p=BG_PAL[S.view==='module'&&S.activeCategory?S.activeCategory:'index']||BG_PAL.index;return p.map(_bgHex)}
+const BG_FS=`#version 300 es
+precision mediump float;
+uniform vec2 uRes;uniform float uT,uE,uP,uB;uniform vec2 uM;uniform vec3 uA,uC,uD;out vec4 o;
+float h(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+float fbm(vec2 p){float v=0.,a=.5;mat2 r=mat2(.8,.6,-.6,.8);for(int i=0;i<5;i++){v+=a*n(p);p=r*p*2.02+3.1;a*=.5;}return v;}
+void main(){
+ vec2 uv=gl_FragCoord.xy/uRes;float asp=uRes.x/uRes.y;vec2 p=(uv-.5)*vec2(asp,1.)*1.7;
+ vec2 m=(uM-.5)*vec2(asp,1.)*1.7;vec2 d=p-m;float w=exp(-dot(d,d)*1.6);
+ float a=w*(.55+uE*.6);p=m+mat2(cos(a),-sin(a),sin(a),cos(a))*d;
+ float t=uT;
+ vec2 q=vec2(fbm(p+vec2(0.,t*.9)),fbm(p+vec2(5.2,1.3)-t*.7));
+ vec2 r=vec2(fbm(p+2.6*q+vec2(1.7,9.2)+t*.5),fbm(p+2.6*q+vec2(8.3,2.8)-t*.6));
+ float f=fbm(p+2.8*r);
+ vec3 c=uA*.05;
+ c=mix(c,uA*.5,smoothstep(.40,.90,f));
+ c=mix(c,uC*.46,smoothstep(.52,1.02,length(r))*.75);
+ c+=uD*.22*smoothstep(.6,.95,q.y)*smoothstep(.4,.8,f);
+ float line=1.-smoothstep(0.,.03,abs(fract(f*5.+t*.35)-.5));
+ c+=mix(uA,uC,uv.x)*line*.06*(1.+uE);
+ c*=uB*(1.+uP*.9+uE*.25);
+ c+=uA*uP*.06*w;
+ c*=mix(.5,1.,smoothstep(1.25,.25,length((uv-.5)*vec2(asp*.8,1.))));
+ o=vec4(c,1.);
+}`;
+function _bgInit(){
+ const host=document.getElementById('bg');if(!host)return false;
+ let img=document.getElementById('bgImg');if(!img){img=document.createElement('div');img.id='bgImg';host.prepend(img)}
+ let cv=document.getElementById('bgFlow');if(!cv){cv=document.createElement('canvas');cv.id='bgFlow';img.after(cv)}
+ BG.cv=cv;
+ if(BG.gl)return true;
+ const gl=cv.getContext('webgl2',{alpha:false,antialias:false,depth:false,powerPreference:'low-power',preserveDrawingBuffer:false});
+ if(!gl){document.body.classList.add('bg-nogl');return false}
+ const sh=(type,src)=>{const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s};
+ try{
+  const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,'#version 300 es\nin vec2 a;void main(){gl_Position=vec4(a,0.,1.);}'));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,BG_FS));gl.linkProgram(pr);
+  if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(pr));
+  gl.useProgram(pr);const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+  const loc=gl.getAttribLocation(pr,'a');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  BG.u={};['uRes','uT','uE','uP','uB','uM','uA','uC','uD'].forEach(k=>BG.u[k]=gl.getUniformLocation(pr,k));
+  BG.gl=gl;
+  cv.addEventListener('webglcontextlost',e=>{e.preventDefault();BG.gl=null;cancelAnimationFrame(BG.raf)});
+  cv.addEventListener('webglcontextrestored',()=>{_bgInit();bgApply()});
+  return true;
+ }catch(e){console.warn('[i2 bg]',e);document.body.classList.add('bg-nogl');return false}
+}
+function _bgSize(){if(!BG.cv)return;const sc=innerWidth>1600?.2:.25;const w=Math.max(160,Math.min(520,Math.round(innerWidth*sc))),h=Math.max(90,Math.round(w*innerHeight/Math.max(1,innerWidth)));if(BG.cv.width!==w||BG.cv.height!==h){BG.cv.width=w;BG.cv.height=h}}
+function _bgDraw(){
+ const gl=BG.gl;if(!gl)return;_bgSize();gl.viewport(0,0,BG.cv.width,BG.cv.height);
+ const lerp=(a,b,k)=>a+(b-a)*k;
+ BG.tcol=_bgTarget();if(!BG.col)BG.col=BG.tcol.map(c=>c.slice());
+ for(let i=0;i<3;i++)for(let j=0;j<3;j++)BG.col[i][j]=lerp(BG.col[i][j],BG.tcol[i][j],.03);
+ BG.mx=lerp(BG.mx,BG.tmx,.04);BG.my=lerp(BG.my,BG.tmy,.04);
+ const c=BG.cfg,u=BG.u;
+ gl.uniform2f(u.uRes,BG.cv.width,BG.cv.height);gl.uniform1f(u.uT,BG.t);gl.uniform1f(u.uE,BG.energy);gl.uniform1f(u.uP,BG.pulse);
+ gl.uniform1f(u.uB,.6+c.intensity*1.2);gl.uniform2f(u.uM,BG.mx,1-BG.my);
+ gl.uniform3fv(u.uA,BG.col[0]);gl.uniform3fv(u.uC,BG.col[1]);gl.uniform3fv(u.uD,BG.col[2]);
+ gl.drawArrays(gl.TRIANGLES,0,3);
+}
+function _bgLoop(now){
+ BG.raf=requestAnimationFrame(_bgLoop);
+ const still=_bgReduce()||BG.cfg.speed<=0.001;
+ // frame budget: 30 fps normally, 15 while a render runs (leave the GPU to ComfyUI), 10 when idle
+ const idle=Date.now()-BG.idle>45000;
+ const fps=S.generating?15:idle?10:30;
+ if(now-BG.last<1000/fps)return;
+ const dt=Math.min(.1,(now-(BG.last||now))/1000);BG.last=now;
+ if(still){BG.t=BG.t||7.3}else BG.t+=dt*(.02+BG.cfg.speed*.09)*(1+BG.energy*1.4)*(idle?.5:1);
+ const want=BG.cfg.react?(S.generating?.55+.25*Math.sin(now/900):0)+BG.eT:0;
+ BG.energy+=(Math.min(1,want)-BG.energy)*.05;BG.eT*=.94;BG.pulse*=.955;
+ _bgDraw();
+ if(still&&Math.abs(BG.energy)<.01&&BG.pulse<.01&&BG.col&&BG.tcol&&Math.abs(BG.col[0][0]-BG.tcol[0][0])<.002){cancelAnimationFrame(BG.raf);BG.raf=0}
+}
+function _bgKick(){BG.idle=Date.now();if(!BG.raf&&BG.gl&&!document.hidden&&(BG.cfg.mode==='flow'||(BG.cfg.mode==='image'&&BG.cfg.mix>0)))BG.raf=requestAnimationFrame(_bgLoop)}
+// things you do nudge the field
+addEventListener('pointermove',e=>{if(!BG.cfg.react)return;BG.tmx=e.clientX/innerWidth;BG.tmy=e.clientY/innerHeight;BG.eT=Math.min(.35,BG.eT+.004);_bgKick()},{passive:true});
+addEventListener('pointerdown',()=>{if(BG.cfg.react){BG.eT=Math.min(.6,BG.eT+.12)}_bgKick()},{passive:true});
+addEventListener('keydown',()=>{if(BG.cfg.react){BG.eT=Math.min(.5,BG.eT+.03)}_bgKick()},{passive:true});
+addEventListener('wheel',()=>{if(BG.cfg.react)BG.eT=Math.min(.4,BG.eT+.02);_bgKick()},{passive:true});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(BG.raf);BG.raf=0}else _bgKick()});
+addEventListener('resize',()=>{_bgSize();_bgKick()});
+{const _sm=selectModule;selectModule=function(){const r=_sm.apply(this,arguments);if(BG.cfg.react)BG.eT=Math.min(.7,BG.eT+.3);_bgKick();return r}}
+{const _h=handleMsg;handleMsg=function(m){try{if(m&&(m.type==='execution_success'||(m.type==='executing'&&m.data&&m.data.node===null))){if(BG.cfg.react)BG.pulse=1;_bgKick()}else if(m&&m.type==='progress')_bgKick()}catch(_){}return _h.apply(this,arguments)}}
+
+// ── image backgrounds: stored in the browser (IndexedDB), never uploaded anywhere ──
+function _bgIdb(){return new Promise((res,rej)=>{const r=indexedDB.open('i2hub-bg',1);r.onupgradeneeded=()=>r.result.createObjectStore('img');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function _bgPutBlob(b){const db=await _bgIdb();return new Promise((res,rej)=>{const t=db.transaction('img','readwrite');t.objectStore('img').put(b,'current');t.oncomplete=res;t.onerror=()=>rej(t.error)})}
+async function _bgGetBlob(){try{const db=await _bgIdb();return await new Promise(res=>{const t=db.transaction('img','readonly');const r=t.objectStore('img').get('current');r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null)})}catch(_){return null}}
+async function _bgLoadImg(){const b=await _bgGetBlob();if(BG.imgUrl)URL.revokeObjectURL(BG.imgUrl);BG.imgUrl=b?URL.createObjectURL(b):null;return BG.imgUrl}
+// big photos are scaled to 2560 px on the long side, so the saved copy stays small
+async function _bgShrink(blob){
+ try{const bmp=await createImageBitmap(blob);const s=Math.min(1,2560/Math.max(bmp.width,bmp.height));if(s>=1&&blob.size<6e6)return blob;
+  const c=document.createElement('canvas');c.width=Math.round(bmp.width*s);c.height=Math.round(bmp.height*s);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+  return await new Promise(r=>c.toBlob(b=>r(b||blob),'image/jpeg',.9));
+ }catch(_){return blob}
+}
+async function bgSetImageBlob(blob,label){
+ if(!blob||!/^image\//.test(blob.type||'image/')){showToast('That isn’t an image','error');return}
+ const b=await _bgShrink(blob);await _bgPutBlob(b);await _bgLoadImg();BG.cfg.mode='image';BG.cfg.imgLabel=label||'';bgSave();bgApply();_bgRepaintCard();showToast('Background set','success');
+}
+function bgPickFile(){const i=document.createElement('input');i.type='file';i.accept='image/*';i.onchange=()=>{const f=i.files&&i.files[0];if(f)bgSetImageBlob(f,f.name)};i.click()}
+async function bgFromUrl(url,label){try{const r=await fetch(url);if(!r.ok)throw new Error(r.status);await bgSetImageBlob(await r.blob(),label)}catch(e){showToast('Couldn’t load that image: '+(e.message||e),'error')}}
+function bgUseGallery(idx){const it=S.gallery&&S.gallery[idx];if(!it||it.type!=='image'){showToast('Pick an image render','error');return}bgFromUrl(getMediaUrl(it),it.filename)}
+function bgUseLatest(){const i=(S.gallery||[]).findIndex(x=>x.type==='image');if(i<0){showToast('No image renders yet this session','error');return}bgUseGallery(i)}
+
+// ── apply the settings ──
+function bgApply(){
+ const c=BG.cfg,b=document.body;if(!b)return;
+ _bgInit();
+ b.classList.toggle('bg-on',c.mode!=='black');b.classList.toggle('bg-mode-image',c.mode==='image');b.classList.toggle('bg-mode-flow',c.mode==='flow');
+ b.style.setProperty('--bg-glass',String(c.glass));
+ const img=document.getElementById('bgImg');
+ if(img){
+  if(c.mode==='image'&&BG.imgUrl){img.style.backgroundImage=`url("${BG.imgUrl}")`;img.style.filter=`blur(${c.blur}px) brightness(${(1-c.dim).toFixed(2)})`;img.style.transform=`scale(${1+c.blur/400+.04})`;img.classList.toggle('drift',!!c.drift&&!_bgReduce());img.style.display='block'}
+  else{img.style.display='none';img.style.backgroundImage=''}
+ }
+ if(BG.cv){BG.cv.style.opacity=c.mode==='flow'?'1':c.mode==='image'?String(c.mix):'0';BG.cv.style.display=(c.mode==='flow'||(c.mode==='image'&&c.mix>0))?'block':'none'}
+ cancelAnimationFrame(BG.raf);BG.raf=0;BG.last=0;_bgKick();
+}
+function bgSet(k,v){BG.cfg[k]=v;bgSave();bgApply();if(k==='mode')_bgRepaintCard()}
+
+// ── Settings card ──
+function _bgCard(){
+ const c=BG.cfg,seg=(k,v,l)=>`<button class="bgc-seg${c[k]===v?' on':''}" onclick="bgSet('${k}','${v}')">${l}</button>`;
+ const sl=(k,l,min,max,step,fmt)=>`<label class="bgc-sl"><span>${l}</span><input type="range" min="${min}" max="${max}" step="${step}" value="${c[k]}" oninput="bgSet('${k}',+this.value);this.nextElementSibling.textContent=(${fmt})(+this.value)"><b>${(new Function('return '+fmt)())(c[k])}</b></label>`;
+ const tg=(k,l)=>`<label class="bgc-tg"><input type="checkbox" ${c[k]?'checked':''} onchange="bgSet('${k}',this.checked)"><span>${l}</span></label>`;
+ const pct="v=>Math.round(v*100)+'%'";
+ let body='';
+ if(c.mode==='flow')body=`${sl('intensity','Glow',0,1,.05,pct)}${sl('speed','Motion',0,1,.05,"v=>v<=0?'still':Math.round(v*100)+'%'")}${tg('react','Reacts to what you do: the channel colour, your pointer, typing and renders')}`;
+ else if(c.mode==='image')body=`<div class="bgc-img"><div class="bgc-thumb" style="${BG.imgUrl?`background-image:url('${BG.imgUrl}')`:''}">${BG.imgUrl?'':'No image yet'}</div><div class="bgc-btns"><button class="dl-btn" onclick="bgPickFile()">Choose image…</button><button class="dl-btn dl-sec" onclick="bgUseLatest()">Use my latest render</button><small>Or open any render and press <b>Set as background</b>. Drop an image on this box too.</small></div></div>${sl('dim','Dim',0,.95,.05,pct)}${sl('blur','Blur',0,30,1,"v=>v+'px'")}${sl('mix','Flow on top',0,1,.05,pct)}${tg('drift','Slow drift')}`;
+ else body=`<small class="bgc-note">Plain black, like before.</small>`;
+ return `<div id="bgCard" class="dl-card bgc" ondragover="event.preventDefault()" ondrop="event.preventDefault();const f=event.dataTransfer.files[0];if(f)bgSetImageBlob(f,f.name)"><div class="dl-ch"><div><div class="midi-t">◐ Background</div><div class="midi-d">What sits behind the panels. Flow moves slowly and takes the colour of the channel you're on; Image uses a picture or one of your renders.</div></div><div class="bgc-segs">${seg('mode','flow','Flow')}${seg('mode','image','Image')}${seg('mode','black','Black')}</div></div>${body}${c.mode!=='black'?sl('glass','Panels',.25,.95,.05,"v=>Math.round(v*100)+'% solid'"):''}</div>`;
+}
+function _bgRepaintCard(){const el=document.getElementById('bgCard');if(el)el.outerHTML=_bgCard()}
+{const _r=renderSettingsTab;renderSettingsTab=function(){const h=_r.apply(this,arguments);return h.replace('<div id="dlCard"',_bgCard()+'<div id="dlCard"')}}
+// "Set as background" on image renders in the viewer
+{const _o=openLB;openLB=function(idx){const r=_o.apply(this,arguments);try{const it=S.gallery[idx];const bar=document.getElementById('lbBar');if(it&&it.type==='image'&&bar&&!bar.querySelector('.lb-bg'))bar.insertAdjacentHTML('beforeend',`<button class="lb-bg" onclick="event.stopPropagation();bgUseGallery(${idx})">◐ Set as background</button>`)}catch(_){}return r}}
+
+(async()=>{if(BG.cfg.mode==='image')await _bgLoadImg();BG.idle=Date.now();bgApply()})();
 
 </script>
 <style>
@@ -9539,6 +9695,43 @@ body.scrubbing,body.scrubbing *{cursor:ew-resize !important;user-select:none !im
 .dlt-foot:empty{display:none}
 .dlt-foot small{font-size:11px;color:var(--tt-dim)}
 @media (max-width:760px){#dlTray{left:8px;right:8px;width:auto;bottom:76px}.dl-cr{grid-template-columns:1fr;gap:4px}.dl-ch{flex-direction:column}}
+</style>
+<style id="x124">
+/* 1.24 — living background: the field and image sit in #bg under the orbs and grain; panels turn to smoked glass */
+#bgFlow,#bgImg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+#bgFlow{image-rendering:auto;transition:opacity .6s ease}
+#bgImg{display:none;background-size:cover;background-position:center;transition:filter .3s ease}
+#bgImg.drift{animation:bgDrift 80s ease-in-out infinite alternate}
+@keyframes bgDrift{from{translate:-1.8% -1.2%}to{translate:1.8% 1.2%}}
+body.bg-on,html:has(body.bg-on){background:transparent!important}
+body.bg-on #bg{background:#000!important}
+body.bg-on .orb{opacity:.28}
+body.bg-on.bg-nogl.bg-mode-flow #bg{background:radial-gradient(120% 90% at 20% 15%,rgba(25,211,107,.18),transparent 60%),radial-gradient(110% 80% at 85% 90%,rgba(59,98,255,.2),transparent 60%),#000!important}
+body:not(.bg-on) #bgFlow,body:not(.bg-on) #bgImg{display:none!important}
+/* smoked glass: the big frames, then cards, then fields */
+body.bg-on #rail,body.bg-on #dock,body.bg-on #stagebar,body.bg-on #flow,body.bg-on .hub-menu,body.bg-on .sys-bar{background:rgba(0,0,0,var(--bg-glass,.62))!important}
+body.bg-on .card,body.bg-on .w-card,body.bg-on .flow-auto,body.bg-on .q-item,body.bg-on .hb,body.bg-on .status-pill,body.bg-on .mod-chip,body.bg-on .lib-det,body.bg-on .dl-list,body.bg-on .dl-card,body.bg-on .hm-row,body.bg-on .tt-idle{background:rgba(0,0,0,calc(var(--bg-glass,.62)*.8))!important}
+body.bg-on .form-input,body.bg-on .form-select,body.bg-on .form-textarea,body.bg-on .dropzone{background:rgba(6,6,6,min(.96,calc(var(--bg-glass,.62) + .2)))!important}
+body.bg-on .dock-item:hover,body.bg-on .ch-row:hover,body.bg-on .pl-row:hover{background:rgba(255,255,255,.06)!important}
+/* the Background card in Settings */
+.bgc-segs{display:flex;border:1px solid var(--tt-line2);flex-shrink:0}
+.bgc-seg{font-family:var(--px);font-size:12px;padding:7px 12px;background:transparent;color:var(--tt-dim);border:0;border-right:1px solid var(--tt-line2);cursor:pointer}
+.bgc-seg:last-child{border-right:0}
+.bgc-seg:hover{color:var(--tt-white)}
+.bgc-seg.on{background:var(--tt-white);color:#000}
+.bgc-sl{display:grid;grid-template-columns:120px 1fr 64px;align-items:center;gap:12px;font-size:12px;color:var(--text-secondary)}
+.bgc-sl span{font-family:var(--px);color:var(--tt-dim)}
+.bgc-sl b{font-family:var(--px);font-weight:400;color:var(--tt-white);text-align:right}
+.bgc-sl input{width:100%;accent-color:var(--tt-green)}
+.bgc-tg{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--text-secondary);cursor:pointer}
+.bgc-tg input{accent-color:var(--tt-green);width:15px;height:15px}
+.bgc-img{display:flex;gap:14px;align-items:stretch}
+.bgc-thumb{width:168px;aspect-ratio:16/9;flex-shrink:0;border:1px solid var(--tt-line2);background:#0b0b0b center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-family:var(--px);font-size:11px;color:var(--tt-dim)}
+.bgc-btns{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.bgc-btns small,.bgc-note{font-size:11px;color:var(--tt-dim)}
+.bgc-btns small b{color:var(--tt-white);font-weight:400}
+#lbBar .lb-bg{white-space:nowrap}
+@media (max-width:760px){.bgc-sl{grid-template-columns:90px 1fr 54px}.bgc-img{flex-direction:column}.bgc-thumb{width:100%}}
 </style>
 
 </body>
