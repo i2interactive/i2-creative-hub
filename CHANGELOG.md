@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.25.2
+
+Fixes from the first real SenseNova renders (RTX 3070 Ti 8 GB, ComfyUI 0.46.3):
+
+- **Illustrated rebuilt: write, then draw.** ComfyUI's interleave task drew one picture and stopped without writing a word on the int8 checkpoint: its built-in system prompt pushes the model to draw first, and the node has no way to change it. Illustrated now writes the answer with a marker for each picture, writes a one-line description per marker, draws each one like Create, and places the pictures where the markers were. Two steps with two pictures took 31 s.
+- **Ask answers in words.** Generate Text now sends a text-only system prompt and a short "answer in words" line. Without them the model began a picture and returned nothing. When it still does (open-ended questions about an attached picture, like "describe this", are the weak spot), the panel says so and suggests asking a direct question. Think first is now off by default: the model writes about 6 words a second on 8 GB.
+- Fixed: the answer panel showed Think's reasoning twice, because ComfyUI's SenseNova node reports its own text too. Only the tool's answer and reasoning outputs reach the panel now.
+- Fixed: Think's picture was repeated as a thumbnail under the reasoning.
+- Copy and Send to give plain text without picture markers.
+
 ## 1.25.1
 
 Fixes from the first test of 1.25.0 on a real rig (ComfyUI 0.46.2):

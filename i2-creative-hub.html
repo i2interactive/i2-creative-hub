@@ -1024,7 +1024,7 @@ const BRAND={
   name:'i2 interactive Creative Hub',         // browser tab + about
   title:'interactive creative hub',           // boot-screen subtitle
   credit:'Made by Ian × Claude',              // footer / about line
-  version:'1.25.1',                            // shown in the connection panel + logo tooltip
+  version:'1.25.2',                            // shown in the connection panel + logo tooltip
   accent:'',                                  // '' = default teal; or a hex like '#4DD8C0'
   server:''                                   // '' = use the built-in default; or 'http://gpu-host:8188'
 };
@@ -1049,7 +1049,7 @@ const MODULES=[
   
   {id:'vid-h3',name:'MiniMax H3',category:'video',catLabel:'Video Generation',icon:'\u25b6',desc:'Video with sound built in \u2014 from text, a still, references, keyframes or a motion video',color:'var(--cat-video)',outputType:'video',simple:[{id:'mode',type:'select',label:'Mode',options:['Text \u2192 Video','Animate a still','From references','Keyframes','Follow motion'],default:'Text \u2192 Video',noLive:true,rerender:true},{id:'speed',type:'select',label:'Speed',options:['Quality','Fast'],default:'Quality',noLive:true,rerender:true},{id:'image',type:'upload',label:'Image',accept:'image/*',showIf:{field:'mode',in:['Animate a still','From references','Keyframes','Follow motion']}},{id:'motion',type:'upload',slot:true,label:'Motion Video (a person moving \u2014 their pose drives the shot)',accept:'video/*',showIf:{field:'mode',equals:'Follow motion'}},{id:'prompt',type:'textarea',label:'Prompt',placeholder:'Describe the scene, the shots and what we hear \u2014 e.g. SHOT 1: \u2026 Audio: wind, footsteps, low score\u2026'}],advanced:[{id:'_q',type:'presetbar',label:'Quality'},{id:'sec_img',type:'section',label:'What the image does: Animate = first frame \u00b7 References = <Picture 1> \u00b7 Keyframes = identity reference \u00b7 Follow motion = optional character'},{id:'last',type:'upload',slot:true,label:'Last Frame (optional)',accept:'image/*',showIf:{field:'mode',equals:'Animate a still'}},{id:'ref2',type:'upload',slot:true,label:'Reference 2 \u2014 <Picture 2> (optional)',accept:'image/*',showIf:{field:'mode',equals:'From references'}},{id:'ref3',type:'upload',slot:true,label:'Reference 3 \u2014 <Picture 3> (optional)',accept:'image/*',showIf:{field:'mode',equals:'From references'}},{id:'ref4',type:'upload',slot:true,label:'Reference 4 \u2014 <Picture 4> (optional)',accept:'image/*',showIf:{field:'mode',equals:'From references'}},{id:'kf1',type:'upload',slot:true,label:'Keyframe A',accept:'image/*',showIf:{field:'mode',equals:'Keyframes'}},{id:'kf1t',type:'slider',label:'Keyframe A at (sec)',min:0,max:15,step:0.25,default:1.5,showIf:{field:'mode',equals:'Keyframes'}},{id:'kf2',type:'upload',slot:true,label:'Keyframe B (optional)',accept:'image/*',showIf:{field:'mode',equals:'Keyframes'}},{id:'kf2t',type:'slider',label:'Keyframe B at (sec)',min:0,max:15,step:0.25,default:3,showIf:{field:'mode',equals:'Keyframes'}},{id:'kf3',type:'upload',slot:true,label:'Keyframe C (optional)',accept:'image/*',showIf:{field:'mode',equals:'Keyframes'}},{id:'kf3t',type:'slider',label:'Keyframe C at (sec)',min:0,max:15,step:0.25,default:5,showIf:{field:'mode',equals:'Keyframes'}},{id:'cnstr',type:'slider',label:'Motion Strength',min:0,max:1.5,step:0.05,default:1,showIf:{field:'mode',equals:'Follow motion'}},{id:'duration',type:'slider',label:'Duration (seconds \u2014 snaps to the model\u2019s native lengths)',min:5,max:15,step:0.5,default:5},{id:'aspect',type:'select',label:'Aspect Ratio',options:['16x9','9x16','1x1','4x3','3x4','3x2','2x3','21x9'],default:'16x9',noLive:true},{id:'mp',type:'slider',label:'Megapixels (capped at H3\u2019s 768px short edge)',min:0.25,max:1,step:0.05,default:0.4},{id:'steps',type:'slider',label:'Steps (Fast mode locks its own)',min:12,max:30,default:20,showIf:{field:'speed',equals:'Quality'}},{id:'seed',type:'number',label:'Seed',default:0}],requiresImage:false,requiresImageWhen:{field:'mode',in:['Animate a still','From references','Keyframes']}},
   {id:'img-qwen21',name:'Qwen Image 2.1',category:'image',catLabel:'Image Generation',icon:'\u2756',desc:'One model to make or edit pictures \u2014 native 2K, real typography, transparent backgrounds',color:'var(--cat-image)',outputType:'image',simple:[{id:'mode',type:'select',label:'Mode',options:['Create','Edit'],default:'Create',noLive:true,rerender:true},{id:'image',type:'upload',label:'Image to edit \u2014 <image1>',accept:'image/*',showIf:{field:'mode',equals:'Edit'}},{id:'prompt',type:'textarea',label:'Prompt',placeholder:'Describe the image \u2014 or for edits, what to change. Address extra pictures as <image2>, <image3>\u2026'}],advanced:[{id:'_q',type:'presetbar',label:'Quality'},{id:'loras',type:'lorastack',label:'LoRA Stack'},{id:'ref2',type:'upload',slot:true,label:'Extra picture \u2014 <image2> (optional)',accept:'image/*',showIf:{field:'mode',equals:'Edit'}},{id:'ref3',type:'upload',slot:true,label:'Extra picture \u2014 <image3> (optional)',accept:'image/*',showIf:{field:'mode',equals:'Edit'}},{id:'ref4',type:'upload',slot:true,label:'Extra picture \u2014 <image4> (optional)',accept:'image/*',showIf:{field:'mode',equals:'Edit'}},{id:'esize',type:'select',label:'Output Size',options:['1 MP','2 MP','2K (4 MP)','Match source'],default:'1 MP',noLive:true,showIf:{field:'mode',equals:'Edit'}},{id:'aspect',type:'select',label:'Aspect Ratio',options:['1x1','16x9','9x16','4x3','3x4','3x2','2x3','21x9'],default:'1x1',noLive:true,showIf:{field:'mode',equals:'Create'}},{id:'mp',type:'slider',label:'Megapixels (4 = native 2K)',min:0.5,max:4,step:0.25,default:1,showIf:{field:'mode',equals:'Create'}},{id:'negative',type:'textarea',label:'Negative Prompt (only applies above CFG 1)',placeholder:'What to keep out\u2026'},{id:'steps',type:'slider',label:'Steps (simple edits hold at 4\u20138)',min:4,max:50,default:25},{id:'cfg',type:'slider',label:'CFG (1 = as published; 2 = tighter on small text)',min:1,max:4,step:0.1,default:1},{id:'seed',type:'number',label:'Seed',default:0}],requiresImage:false,requiresImageWhen:{field:'mode',equals:'Edit'}},
-  {id:'img-sensenova',name:'SenseNova U1.6',category:'image',catLabel:'Image Generation',icon:'\u25c8',textOut:true,desc:'One model that draws, reasons, writes and edits \u2014 posters with real text, illustrated answers, questions about a picture',color:'var(--cat-image)',outputType:'image',simple:[{id:'mode',type:'select',label:'Mode',options:['Create','Think','Illustrated','Ask','Edit'],default:'Create',noLive:true,rerender:true},{id:'image',type:'upload',label:'Picture \u2014 image 1 (needed for Edit, optional for Ask)',accept:'image/*',showIf:{field:'mode',in:['Edit','Ask']}},{id:'prompt',type:'textarea',label:'Prompt',placeholder:'Describe the picture, ask for an illustrated guide, ask a question, or say what to change. Put words that should appear in the picture in quotes \u2014 a poster that says \u201cDEAD AIR\u201d\u2026'}],advanced:[{id:'_q',type:'presetbar',label:'Quality'},{id:'ref2',type:'upload',slot:true,label:'Extra picture \u2014 image 2 (optional)',accept:'image/*',showIf:{field:'mode',in:['Edit','Ask']}},{id:'ref3',type:'upload',slot:true,label:'Extra picture \u2014 image 3 (optional)',accept:'image/*',showIf:{field:'mode',in:['Edit','Ask']}},{id:'thinking',type:'toggle',label:'Think first \u2014 reasons before answering, and shows you its reasoning',default:true,showIf:{field:'mode',in:['Illustrated','Ask']}},{id:'pictures',type:'slider',label:'Most pictures',min:1,max:8,step:1,default:4,showIf:{field:'mode',equals:'Illustrated'}},{id:'tokens',type:'slider',label:'Most words per step (tokens)',min:256,max:4096,step:128,default:1024,showIf:{field:'mode',in:['Think','Illustrated','Ask']}},{id:'speed',type:'select',label:'Speed',options:['Turbo','Quality'],default:'Turbo',noLive:true,rerender:true,showIf:{field:'mode',not:'Ask'}},{id:'selfcheck',type:'toggle',label:'Self-correction \u2014 reviews the picture and redraws to fix text (each pass is another render)',default:false,noLive:true,rerender:true,showIf:{field:'mode',in:['Create','Edit']}},{id:'passes',type:'slider',label:'Most self-correction passes',min:1,max:5,step:1,default:5,showIf:[{field:'selfcheck',truthy:true},{field:'mode',in:['Create','Edit']}]},{id:'aspect',type:'select',label:'Aspect Ratio',options:['4x3','3x4','1x1','16x9','9x16','3x2','2x3','21x9'],default:'4x3',noLive:true,showIf:{field:'mode',in:['Create','Think','Illustrated']}},{id:'mp',type:'slider',label:'Megapixels (4 = as published; in Edit, the source is scaled to this)',min:0.5,max:4,step:0.25,default:2,showIf:{field:'mode',not:'Ask'}},{id:'negative',type:'textarea',label:'Negative Prompt',placeholder:'What to keep out\u2026',showIf:[{field:'speed',equals:'Quality'},{field:'mode',not:'Ask'}]},{id:'steps_t',type:'slider',label:'Steps (the turbo LoRA is made for 8)',min:4,max:16,default:8,showIf:[{field:'speed',equals:'Turbo'},{field:'mode',not:'Ask'}]},{id:'steps_q',type:'slider',label:'Steps',min:20,max:80,default:50,showIf:[{field:'speed',equals:'Quality'},{field:'mode',not:'Ask'}]},{id:'cfg_q',type:'slider',label:'CFG',min:1,max:8,step:0.1,default:4,showIf:[{field:'speed',equals:'Quality'},{field:'mode',not:'Ask'}]},{id:'seed',type:'number',label:'Seed',default:0}],requiresImage:false,requiresImageWhen:{field:'mode',equals:'Edit'}},
+  {id:'img-sensenova',name:'SenseNova U1.6',category:'image',catLabel:'Image Generation',icon:'\u25c8',textOut:true,desc:'One model that draws, reasons, writes and edits \u2014 posters with real text, illustrated answers, questions about a picture',color:'var(--cat-image)',outputType:'image',simple:[{id:'mode',type:'select',label:'Mode',options:['Create','Think','Illustrated','Ask','Edit'],default:'Create',noLive:true,rerender:true},{id:'image',type:'upload',label:'Picture \u2014 image 1 (needed for Edit, optional for Ask)',accept:'image/*',showIf:{field:'mode',in:['Edit','Ask']}},{id:'prompt',type:'textarea',label:'Prompt',placeholder:'Describe the picture, ask for an illustrated guide, ask a question, or say what to change. Put words that should appear in the picture in quotes \u2014 a poster that says \u201cDEAD AIR\u201d\u2026'}],advanced:[{id:'_q',type:'presetbar',label:'Quality'},{id:'ref2',type:'upload',slot:true,label:'Extra picture \u2014 image 2 (optional)',accept:'image/*',showIf:{field:'mode',in:['Edit','Ask']}},{id:'ref3',type:'upload',slot:true,label:'Extra picture \u2014 image 3 (optional)',accept:'image/*',showIf:{field:'mode',in:['Edit','Ask']}},{id:'thinking',type:'toggle',label:'Think first \u2014 reasons before answering and shows its reasoning (slow: about 6 words a second on 8 GB)',default:false,showIf:{field:'mode',in:['Illustrated','Ask']}},{id:'pictures',type:'slider',label:'Most pictures',min:1,max:8,step:1,default:4,showIf:{field:'mode',equals:'Illustrated'}},{id:'tokens',type:'slider',label:'Most words per step (tokens)',min:256,max:4096,step:128,default:1024,showIf:{field:'mode',in:['Think','Illustrated','Ask']}},{id:'speed',type:'select',label:'Speed',options:['Turbo','Quality'],default:'Turbo',noLive:true,rerender:true,showIf:{field:'mode',not:'Ask'}},{id:'selfcheck',type:'toggle',label:'Self-correction \u2014 reviews the picture and redraws to fix text (each pass is another render)',default:false,noLive:true,rerender:true,showIf:{field:'mode',in:['Create','Edit']}},{id:'passes',type:'slider',label:'Most self-correction passes',min:1,max:5,step:1,default:5,showIf:[{field:'selfcheck',truthy:true},{field:'mode',in:['Create','Edit']}]},{id:'aspect',type:'select',label:'Aspect Ratio',options:['4x3','3x4','1x1','16x9','9x16','3x2','2x3','21x9'],default:'4x3',noLive:true,showIf:{field:'mode',in:['Create','Think','Illustrated']}},{id:'mp',type:'slider',label:'Megapixels (4 = as published; in Edit, the source is scaled to this)',min:0.5,max:4,step:0.25,default:2,showIf:{field:'mode',not:'Ask'}},{id:'negative',type:'textarea',label:'Negative Prompt',placeholder:'What to keep out\u2026',showIf:[{field:'speed',equals:'Quality'},{field:'mode',not:'Ask'}]},{id:'steps_t',type:'slider',label:'Steps (the turbo LoRA is made for 8)',min:4,max:16,default:8,showIf:[{field:'speed',equals:'Turbo'},{field:'mode',not:'Ask'}]},{id:'steps_q',type:'slider',label:'Steps',min:20,max:80,default:50,showIf:[{field:'speed',equals:'Quality'},{field:'mode',not:'Ask'}]},{id:'cfg_q',type:'slider',label:'CFG',min:1,max:8,step:0.1,default:4,showIf:[{field:'speed',equals:'Quality'},{field:'mode',not:'Ask'}]},{id:'seed',type:'number',label:'Seed',default:0}],requiresImage:false,requiresImageWhen:{field:'mode',equals:'Edit'}},
   {id:'3d-model',name:'3D Model',category:'3d',catLabel:'3D & Depth',icon:'\u25a3',desc:'A picture becomes a textured 3D model \u2014 or feed it a turnaround sheet for true sides and back',color:'var(--cat-3d)',outputType:'3d',simple:[{id:'mode',type:'select',label:'Input',options:['Single image','Turnaround sheet'],default:'Single image',noLive:true,rerender:true},{id:'image',type:'upload',label:'Image',accept:'image/*'}],advanced:[{id:'rembg',type:'toggle',label:'Remove background first',default:true,showIf:{field:'mode',equals:'Single image'}},{id:'sec_mv',type:'section',label:'Turnaround sheet: front, side and back views on one image \u2014 Character Sheet makes these',showIf:{field:'mode',equals:'Turnaround sheet'}},{id:'seed',type:'number',label:'Seed',default:0}],requiresImage:true},
   {id:'3d-mocap',name:'Motion Capture',category:'3d',catLabel:'3D & Depth',icon:'\u2b2c',desc:'Film a person, get an animated 3D body file plus an overlay video',color:'var(--cat-3d)',outputType:'3d',requiresVideo:true,simple:[{id:'video',type:'upload',label:'Video of a person',accept:'video/*'}],advanced:[{id:'start',type:'slider',label:'Start at (sec)',min:0,max:60,step:0.5,default:0},{id:'clip',type:'slider',label:'Length (sec)',min:1,max:30,step:0.5,default:5},{id:'people',type:'slider',label:'Max people',min:1,max:6,default:1}],requiresImage:false},
   {id:'prep-maps',name:'Image Maps',category:'prep',catLabel:'Prep',icon:'\u25e7',desc:'Pull depth, surface normals, true color, pose or edges out of any picture',color:'var(--cat-assets)',outputType:'image',requiresImage:true,simple:[{id:'map',type:'select',label:'Map',options:['Depth','Surface normals','Albedo (true color)','Pose','Edges'],default:'Depth',noLive:true,rerender:true},{id:'image',type:'upload',label:'Image',accept:'image/*'}],advanced:[{id:'sec_m',type:'section',label:'Depth, normals and albedo use Marigold V2 \u2014 sharp and accurate, but heavy on 8GB cards'},{id:'low',type:'slider',label:'Edge low threshold',min:0.01,max:0.99,step:0.01,default:0.4,showIf:{field:'map',equals:'Edges'}},{id:'high',type:'slider',label:'Edge high threshold',min:0.01,max:0.99,step:0.01,default:0.8,showIf:{field:'map',equals:'Edges'}}]},
@@ -1814,7 +1814,7 @@ function handleMsg(m){
     if(S.autoUpscale&&meta&&!['up-creative','up-traditional','up-rtx'].includes(meta.moduleId)&&!(S.pipeline&&S.pipeline.running)&&!(S.graph&&S.graph.running)&&o?.images)o.images.forEach(i=>{if(!_isVid(i.filename))autoUpscaleImage({type:'image',filename:i.filename,subfolder:i.subfolder||'',fileType:i.type||'output'})});
     if(S.pipeline&&S.pipeline.running&&pid===S.pipeline.currentPid){const im=o?.images&&o.images[0];pcAdvance(im?{type:'image',filename:im.filename,subfolder:im.subfolder||'',fileType:im.type||'output'}:null)}
     if(S.graph&&S.graph.running&&S.graph.pending&&S.graph.pending[pid]){const im=o?.images&&o.images[0];ngAdvance(pid,im?{type:'image',filename:im.filename,subfolder:im.subfolder||'',fileType:im.type||'output'}:null)}
-    if(o?.text){const _t=Array.isArray(o.text)?o.text.join('\n'):String(o.text);if(m.data?.node==='think')S.thinkOutput=_t;else S.textOutput=_t;S._textPid=pid;S._textMod=meta?meta.moduleId:null;if(S.activeModule)renderModule(S.activeModule)}
+    if(o?.text){const _t=Array.isArray(o.text)?o.text.join('\n'):String(o.text);const _tm=meta?MODULES.find(x=>x.id===meta.moduleId):null;if(_tm&&_tm.textOut&&!['answer','think'].includes(m.data?.node)){}else{if(m.data?.node==='think')S.thinkOutput=_t;else S.textOutput=_t;S._textPid=pid;S._textMod=meta?meta.moduleId:null;}if(S.activeModule)renderModule(S.activeModule)}
     else if(o?.images&&pid&&pid===S._textPid&&(S.textOutput||'').includes('<image>')&&S.activeModule)renderModule(S.activeModule);
   }
   else if(m.type==='execution_error'){
@@ -2570,15 +2570,23 @@ case 'img-krea2':{
   // does that). Built here rather than stored, because five modes share it:
   //   Create / Edit  one pass, or the template's generate → review → redraw loop
   //   Think          'image thinking': it reasons in text, then draws
-  //   Illustrated    'interleave': it writes and asks for pictures as it goes;
-  //                  same Start/End Loop, one KSampler run per picture
-  //   Ask            text only: Generate Text on the checkpoint's own CLIP
-  // Text comes back through PreviewAny nodes named 'answer' and 'think'.
+  //   Illustrated    write, then draw: Generate Text writes the answer with
+  //                  [PICTURE n] markers, one short call per marker describes
+  //                  that picture, each is drawn like Create, and the markers
+  //                  become <image> so the hub places the pictures.
+  //                  (ComfyUI's 'interleave' task was tried first: on the int8
+  //                  checkpoint it draws one picture and stops without a word,
+  //                  because its fixed system prompt pushes it to draw first.)
+  //   Ask            text only: Generate Text on the checkpoint's own CLIP, with
+  //                  a text-only system prompt for the same reason
+  // Text comes back through PreviewAny nodes named 'answer' and 'think'; the hub
+  // ignores text from any other node of this tool (SenseNova Conditioning
+  // reports its own text too).
   const mode=['Create','Think','Illustrated','Ask','Edit'].includes(v.mode)?v.mode:'Create';
   const on=x=>x===true||x==='true';
   const turbo=(v.speed||'Turbo')!=='Quality';
   const fix=on(v.selfcheck)&&(mode==='Create'||mode==='Edit');
-  const think=v.thinking===undefined?true:on(v.thinking);
+  const think=on(v.thinking);
   const toks=Math.max(64,Math.min(8192,Math.round(+(v.tokens??1024)||1024)));
   const steps=turbo?(v.steps_t??8):(v.steps_q??50),cfg=turbo?1:(v.cfg_q??4);
   const mp=Math.max(0.25,Math.min(4,+(v.mp??2)||2));
@@ -2595,10 +2603,16 @@ case 'img-krea2':{
       refs.push(id)});
   }
   const preview=(id,src)=>{wf[id]={class_type:'PreviewAny',inputs:{source:src}}};
+  // Generate Text on the checkpoint's CLIP. Its default (interleave) system
+  // prompt tells the model to mix in pictures, and it then starts one instead of
+  // answering, which ends the text at once; a text-only system prompt and a
+  // one-line nudge keep it writing.
+  const gen=(id,prompt,sys)=>{const a={clip:['1',1],prompt,max_length:toks,sampling_mode:'on','sampling_mode.temperature':0.7,'sampling_mode.top_k':64,'sampling_mode.top_p':0.95,'sampling_mode.min_p':0.05,'sampling_mode.repetition_penalty':1.05,'sampling_mode.presence_penalty':0,'sampling_mode.seed':seed,thinking:think,use_default_template:true,mtp:'auto',system_prompt:sys};
+    wf[id]={class_type:'TextGenerateV2',inputs:a};return a};
   if(mode==='Ask'){
-    const a={clip:['1',1],prompt:v.prompt||'',max_length:toks,sampling_mode:'on','sampling_mode.temperature':0.7,'sampling_mode.top_k':64,'sampling_mode.top_p':0.95,'sampling_mode.min_p':0.05,'sampling_mode.repetition_penalty':1.05,'sampling_mode.presence_penalty':0,'sampling_mode.seed':seed,thinking:think,use_default_template:true,mtp:'auto',system_prompt:''};
+    const a=gen('ask',(v.prompt||'')+'\n\n(Answer in words only. Do not draw anything.)',
+      'You are a helpful assistant that answers questions, and questions about images, in plain text. Never generate images.');
     refs.forEach((r,i)=>{a['images.image'+(i+1)]=[r,0]});
-    wf['ask']={class_type:'TextGenerateV2',inputs:a};
     preview('answer',['ask',0]);if(think)preview('think',['ask',1]);
     break;
   }
@@ -2615,13 +2629,33 @@ case 'img-krea2':{
   const ks=(id,pos,neg,sd)=>{wf[id]={class_type:'KSampler',inputs:{model:[model,0],seed:sd,steps,cfg,sampler_name:'euler',scheduler:'simple',positive:pos,negative:neg,latent_image:['6',0],denoise:1}}};
   const save=src=>{wf['24']={class_type:'SaveImage',inputs:{images:src,filename_prefix:'SenseNova_u1.6'+(mode==='Create'?'':'_'+mode.toLowerCase())}}};
   const get=(id,list,ix)=>{wf[id]={class_type:'GetItemFromList',inputs:{list,index:ix}}};
-  if(mode==='Think'){
+  if(mode==='Illustrated'){
+    // The model stops writing the moment it wants to draw, so it never sees a
+    // picture request: it writes the answer with bare [PICTURE n] markers, a
+    // short call per marker turns each into a description, and those are drawn.
+    const n=Math.max(1,Math.min(8,Math.round(+(v.pictures??4)||4)));
+    const W='You are a writer. You can only write text; you cannot create images. Someone else draws the pictures from your markers and descriptions.';
+    gen('plan','Request: '+(v.prompt||'')+`\n\nWrite the full answer as text. Where each picture goes, write only a marker on its own line: ${Array.from({length:n},(_,i)=>'[PICTURE '+(i+1)+']').join(', then ')}. Do not describe the pictures. Use exactly ${n} marker${n>1?'s':''}.`,W);
+    const pics=[];
+    for(let i=1;i<=n;i++){
+      wf['pq'+i]={class_type:'StringConcatenate',inputs:{string_a:['plan',0],string_b:`Write one sentence describing exactly what [PICTURE ${i}] shows, for the artist who will draw it, with any words that should appear in it in quotes. Reply with that sentence only.`,delimiter:'\n\n'}};
+      const d=gen('pd'+i,['pq'+i,0],W);Object.assign(d,{max_length:200,thinking:false,'sampling_mode.seed':seed+i});
+      wf['pe'+i]={class_type:'CLIPTextEncode',inputs:{text:['pd'+i,0],clip:['1',1]}};
+      ks('pk'+i,['pe'+i,0],['5',0],seed+i);
+      wf['pv'+i]={class_type:'VAEDecode',inputs:{samples:['pk'+i,0],vae:['1',2]}};
+      pics.push(['pv'+i,0]);
+    }
+    wf['pl']={class_type:'CreateList',inputs:Object.fromEntries(pics.map((p,i)=>['inputs.input'+i,p]))};
+    save(['pl',0]);delete wf['4'];delete wf['29'];
+    wf['pa']={class_type:'RegexReplace',inputs:{string:['plan',0],regex_pattern:'^[ \\t*#>-]*\\[?\\s*PICTURE\\s*\\d+\\s*\\]?.*$',replace:'<image>',case_insensitive:true,multiline:true,dotall:false,count:0}};
+    preview('answer',['pa',0]);if(think)preview('think',['plan',1]);
+  }else if(mode==='Think'){
     wf['85']={class_type:'SenseNovaConditioning',inputs:{conditioning:['29',0],negative:['29',1],clip:['1',1],task:'image thinking',max_tokens:toks}};
     ks('67',['85',0],['85',2],seed);
     wf['69']={class_type:'VAEDecode',inputs:{samples:['67',0],vae:['1',2]}};save(['69',0]);
     preview('think',['85',1]);
-  }else if(fix||mode==='Illustrated'){
-    const il=mode==='Illustrated';
+  }else if(fix){
+    const il=false;
     const n=il?Math.max(1,Math.min(8,Math.round(+(v.pictures??4)||4)))+1:Math.max(1,Math.min(5,Math.round(+(v.passes??5)||5)));
     wf['7']={class_type:'PrimitiveInt',inputs:{value:seed}};
     wf['44']={class_type:'CreateList',inputs:{'inputs.input0':['29',0],'inputs.input1':['29',1]}};
@@ -2638,7 +2672,6 @@ case 'img-krea2':{
     get('21',['20',0],0);get('22',['20',0],2);
     wf['23']={class_type:'SenseNovaInterleaveDecode',inputs:{clip:['1',1],conditioning:['21',0],samples:['22',0]}};
     save(['23',1]);
-    if(il){preview('answer',['23',0]);if(think)preview('think',['23',2])}
   }else{
     // one pass; pictures in are encoded first with the 'image' task, as in the edit template
     let pos=['4',0],neg=['5',0];
@@ -3334,14 +3367,15 @@ function renderModule(id){
   h+=`</div><aside class="prog-side"><div id="progMon">${ttSet(id)}</div>`;
   if(S.textOutput&&mod.outputType==='text'&&(!S._textMod||S._textMod===mod.id)){
     h+=`<div class="out-card"><h3>Output</h3><pre>${escHtml(S.textOutput)}</pre><div class="oc-btns"><button class="btn btn-sm btn-primary" onclick="copyTextOutput()">Copy</button><button class="btn btn-sm btn-secondary" onclick="sendTextMenu(event)">Send to ⇢</button></div></div>`;
-  }else if(mod.textOut&&S._textMod===mod.id&&(S.textOutput||S.thinkOutput)){
+  }else if(mod.textOut&&S._textMod===mod.id&&(S.textOutput!=null||S.thinkOutput)){
     // tools that answer in words as well as pictures (SenseNova): the answer, with
     // any pictures it drew placed where the text says <image>, then the reasoning
     const pics=S.gallery.filter(g=>g.pid===S._textPid&&g.type==='image').reverse();let k=0;
     const pic=g=>`<img class="oc-pic" src="${escAttr(getMediaUrl(g))}" alt="" loading="lazy" onclick="openLB(S.gallery.indexOf(S.gallery.find(x=>x.filename===${escAttr(JSON.stringify(g.filename))})))">`;
     const body=S.textOutput?String(S.textOutput).split('<image>').map((t,i)=>(i&&pics[k]?pic(pics[k++]):'')+(t.trim()?`<div class="oc-txt">${escHtml(t.trim())}</div>`:'')).join(''):'';
-    const rest=pics.slice(k).map(pic).join('');
-    h+=`<div class="out-card"><h3>${S.textOutput?'Answer':'Reasoning'}</h3>${body?`<div class="oc-flow">${body}${rest?`<div class="oc-pics">${rest}</div>`:''}</div>`:''}${S.thinkOutput?(S.textOutput?`<details class="oc-think"><summary>How it got there</summary><pre>${escHtml(S.thinkOutput)}</pre></details>`:`<pre>${escHtml(S.thinkOutput)}</pre>`):''}<div class="oc-btns">${S.textOutput?`<button class="btn btn-sm btn-primary" onclick="copyTextOutput()">Copy</button><button class="btn btn-sm btn-secondary" onclick="sendTextMenu(event)">Send to ⇢</button>`:''}</div></div>`;
+    const rest=(pics.length>1||String(S.textOutput||'').includes('<image>'))?pics.slice(k).map(pic).join(''):'';
+    const none=S.textOutput===''&&!body&&!S.thinkOutput?`<div class="oc-flow"><div class="oc-txt">No answer came back: the model started a picture instead of writing. Ask it as a question (“What does…”, “Which…”), or turn on Think first.</div></div>`:'';
+    h+=`<div class="out-card"><h3>${S.textOutput!=null?'Answer':'Reasoning'}</h3>${none}${body?`<div class="oc-flow">${body}${rest?`<div class="oc-pics">${rest}</div>`:''}</div>`:''}${S.thinkOutput?(S.textOutput?`<details class="oc-think"><summary>How it got there</summary><pre>${escHtml(S.thinkOutput)}</pre></details>`:`<pre>${escHtml(S.thinkOutput)}</pre>`):''}<div class="oc-btns">${S.textOutput?`<button class="btn btn-sm btn-primary" onclick="copyTextOutput()">Copy</button><button class="btn btn-sm btn-secondary" onclick="sendTextMenu(event)">Send to ⇢</button>`:''}</div></div>`;
   }
   let tips='';try{tips=getModuleTips(mod)||''}catch(_){}
   if(tips)h+=`<details class="drw howto"><summary>How to use this</summary><div class="drw-body">${tips}</div></details>`;
@@ -3845,7 +3879,7 @@ const MODULE_HELP={
  'img-qwen21':{how:['Pick Create to make a new picture, or Edit to change one.','In Edit, upload the picture — it’s <image1>. Extra pictures go in More settings as <image2>–<image4>.','Write the prompt (or the change), then Generate.'],
   tips:['Qwen renders real typography: put the exact words in quotes, e.g. a poster that says “DEAD AIR”.','Refer to extra pictures by name: “put the jacket from <image2> on the man in <image1>”.','Megapixels 4 gives native 2K but is heavy on 8GB — draft at 1 MP.','Simple edits hold up at 4–8 steps; raise CFG to 2 when small text comes out wrong.']},
  'img-sensenova':{how:['Pick a Mode. Create makes a picture; Think reasons about the layout first; Illustrated writes an answer and draws pictures where they help; Ask answers in words, about a picture if you add one; Edit changes the picture you upload.','Write the prompt \u2014 the picture, the question, or the change.','Generate. Words and reasoning show up next to the result.'],
-  tips:['Put every word that should appear in a picture in quotes; unquoted text is where spelling mistakes come from.','Self-correction (Create and Edit) checks the picture against your prompt, flags garbled text, typos and wrong numbering, and redraws \u2014 up to five passes. Leave it off for portraits and photos.','Illustrated is the model writing and drawing in one go: ask for a step-by-step guide, a short comic, or a scene broken into beats. Each picture is another render, so draft it at 1 MP.','Ask runs no image model at all, so it\u2019s the quickest mode. Add up to three pictures and refer to them as image 1, 2 and 3.','Turbo (8 steps, CFG 1) is for trying ideas; Quality (50 steps, CFG 4) is for the final, and the only setting where the negative prompt does anything.','It\u2019s an 8B model: 2 MP is a fair size on 8 GB; 4 MP is as published and much slower.']},
+  tips:['Put every word that should appear in a picture in quotes; unquoted text is where spelling mistakes come from.','Self-correction (Create and Edit) checks the picture against your prompt, flags garbled text, typos and wrong numbering, and redraws \u2014 up to five passes. Leave it off for portraits and photos.','Illustrated writes the answer first, then a description for each picture, then draws them and puts each one where it belongs. Ask for a step-by-step guide, a short comic, or a scene broken into beats. Each picture is another render, so draft at 1 MP.','Ask runs no image model at all, so it\u2019s the quickest mode. Add up to three pictures and refer to them as image 1, 2 and 3. Phrase it as a question (\u201cWhat does the sign say?\u201d): an instruction like \u201cdescribe this\u201d can make the model start a picture instead.','Think first and Think write at about 6 words a second on an 8 GB card and count against Most words per step \u2014 a long think can use up the budget before the answer.','Turbo (8 steps, CFG 1) is for trying ideas; Quality (50 steps, CFG 4) is for the final, and the only setting where the negative prompt does anything.','It\u2019s an 8B model: 2 MP is a fair size on 8 GB; 4 MP is as published and much slower.']},
  'img-anima':{how:['Write a tag-style prompt: quality tags first, then subject and scene.','Set size in More settings.','Generate.'],
   tips:['Start with “masterpiece, best quality, anime,” — Anima expects booru-style tags.','The default negative prompt is a good baseline; add things you keep seeing that you don’t want.','The defaults (er_sde, 30 steps, CFG 4) are a solid start; dropping steps much lower gets soft fast.']},
  'img-style':{how:['Upload a reference image — its layout and edges are kept.','Describe the style you want in Style Prompt.','Generate.'],
@@ -7590,9 +7624,11 @@ function sendImageMenu(e,idx){
 function sendTextMenu(e){
   if(!S.textOutput)return;
   const targets=MODULES.filter(m=>!m.isGallery&&[...(m.simple||[])].some(i=>i.type==='textarea'&&i.id==='prompt'));
-  openCtxMenu(e,'Send prompt to…',targets.map(m=>({icon:m.icon,name:m.name,fn:()=>{S.formValues[m.id]={...(S.formValues[m.id]||{}),prompt:S.textOutput};selectModule(m.id);showToast('Prompt sent to '+m.name,'success')}})));
+  openCtxMenu(e,'Send prompt to…',targets.map(m=>({icon:m.icon,name:m.name,fn:()=>{S.formValues[m.id]={...(S.formValues[m.id]||{}),prompt:_plainText()};selectModule(m.id);showToast('Prompt sent to '+m.name,'success')}})));
 }
-function copyTextOutput(){if(!S.textOutput)return;navigator.clipboard.writeText(S.textOutput).then(()=>showToast('Output copied','success')).catch(()=>showToast('Copy failed','error'))}
+// answers that place pictures carry <image> markers; copies and hand-offs get plain text
+function _plainText(){return String(S.textOutput||'').replace(/[ \t]*<image>[ \t]*/g,'\n').replace(/\n{3,}/g,'\n\n').trim()}
+function copyTextOutput(){if(!S.textOutput)return;navigator.clipboard.writeText(_plainText()).then(()=>showToast('Output copied','success')).catch(()=>showToast('Copy failed','error'))}
 
 // ── COMMAND PALETTE (Ctrl+K) ──
 let _palSel=0;
