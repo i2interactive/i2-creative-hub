@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.25.3
+
+From a full check of the hub on an RTX 3070 Ti 8 GB (ComfyUI 0.46.3):
+
+- **Motion Capture is much faster on phone footage.** The clip's frames are brought to 1280 px on the long side before tracking, and MoGe, which only supplies the camera's field of view, now reads the first frame instead of every frame. A 5-second 4K iPhone clip finished in under 6 minutes; before, the depth step alone was on course for about 18 minutes.
+- **Video tools warn before a clip that won't fit in memory.** ComfyUI holds every frame of a clip, and of the result, in RAM. RTX Video Finish, Video Upscale, Frame Interpolation and Motion Capture now estimate that from the clip and ask before queueing when it's more than about 60% of your RAM. (An 89-second clip at 2× asked for 42 GB on a 34 GB PC.)
+
 ## 1.25.2
 
 Fixes from the first real SenseNova renders (RTX 3070 Ti 8 GB, ComfyUI 0.46.3):

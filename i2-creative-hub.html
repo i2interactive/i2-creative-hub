@@ -1024,7 +1024,7 @@ const BRAND={
   name:'i2 interactive Creative Hub',         // browser tab + about
   title:'interactive creative hub',           // boot-screen subtitle
   credit:'Made by Ian × Claude',              // footer / about line
-  version:'1.25.2',                            // shown in the connection panel + logo tooltip
+  version:'1.25.3',                            // shown in the connection panel + logo tooltip
   accent:'',                                  // '' = default teal; or a hex like '#4DD8C0'
   server:''                                   // '' = use the built-in default; or 'http://gpu-host:8188'
 };
@@ -2158,6 +2158,7 @@ async function generateModule(moduleId){
       const wf=buildWorkflow(mod,vv);
       if(i===0&&!preflight(wf))return; // missing-node guard before anything queues
       if(i===0&&!preflightModels(wf))return; // missing-model guard (friendly alert, nothing queued)
+      if(i===0&&mod.requiresVideo&&!(await _videoMemOk(mod,vv)))return; // long clips: ComfyUI holds every frame in RAM
       const res=await queuePrompt(wf); // queue at the server FIRST — only track items that actually queued
       const pid=res?.prompt_id;
       const item={name:mod.name+(n>1?` (${i+1}/${n})`:''),moduleId,promptId:pid,meta:{moduleId,params:vv}};
@@ -2174,6 +2175,26 @@ async function generateModule(moduleId){
     if(S.activeModule)renderModule(S.activeModule);
   }catch(e){if(S.queue.length&&!S.generating){S.generating=true;S.stepTimes=[];startTimer();document.getElementById('progressTitle').textContent=S.queue[0].name;showProgress('Preparing…',0)}updateBtn();if(e&&e.queueErrors&&e.queueErrors.length)showQueueError(e.queueErrors);else showToast(/Failed to fetch|NetworkError/i.test(e&&e.message||'')?'Couldn’t reach ComfyUI — is it still running?':(e.message||'Queue failed'),'error')}
 }
+// ComfyUI loads a whole clip as 32-bit float frames and keeps the output frames
+// too, so a long or large clip can need more RAM than the PC has (an 89 s clip
+// at 2× asked for 42 GB). Estimate it from the clip's metadata and ask first.
+async function _videoMemOk(mod,v){try{
+ const f=S.uploadedFiles[mod.id]?.comfyName;if(!f)return true;
+ const el=document.createElement('video');el.preload='metadata';el.muted=true;
+ el.src=`${getServer()}/view?filename=${encodeURIComponent(f)}&type=input`;
+ await new Promise(r=>{el.onloadedmetadata=r;el.onerror=r;setTimeout(r,4000)});
+ const dur=el.duration,w=el.videoWidth,h=el.videoHeight;el.removeAttribute('src');
+ if(!isFinite(dur)||!dur||!w||!h)return true;
+ let secs=dur,k=1;                                   // k: output pixels per input pixel
+ if(mod.id==='vid-rtx'){const s=parseFloat(v.upscale)||1;k=s*s*(parseInt(v.motion)||1)}
+ else if(mod.id==='vid-upscale')k=/SeedVR2/.test(v.method||'')?4:16;
+ else if(mod.id==='vid-interp')k=+v.multiplier||2;
+ else if(mod.id==='3d-mocap'){secs=Math.min(dur,+(v.clip??5));w>1280||h>1280?k=0.3:k=1}
+ const frames=secs*30,need=frames*w*h*3*4*(1+k);
+ const ss=await fetch(`${getServer()}/system_stats`).then(r=>r.json());const total=ss?.system?.ram_total||0;
+ if(!total||need<total*0.6)return true;
+ return confirm(`This clip is ${Math.round(dur)} s at ${w}×${h} (about ${Math.round(frames)} frames). ComfyUI keeps every frame in memory, so this needs roughly ${Math.round(need/1e9)} GB of RAM and your PC has ${Math.round(total/1e9)} GB. It may crawl or fail.\n\nTrim the clip or lower the scale first. Run it anyway?`);
+}catch(_){return true}}
 function setBatch(n){S.batch=n;localStorage.setItem('i2hub_batch',String(n));document.querySelectorAll('.seg button[data-n]').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.n)===n))}
 async function removeQueueItem(idx){
   const item=S.queue[idx];if(!item)return;
@@ -2695,7 +2716,14 @@ case 'img-krea2':{
   // SAM 3D Body: tracked person → animated GLB + mesh-overlay video.
   Object.assign(wf,tplBuildX(TPLget('sam3d'),{
     bind:{'85.file':img,'125.start_time':+(v.start??0),'125.duration':+(v.clip??5),'18.max_objects':+(v.people??1),
-      '135.filename_prefix':'video/i2_mocap','143.filename_prefix':'3d/i2_mocap'}}));
+      '135.filename_prefix':'video/i2_mocap','143.filename_prefix':'3d/i2_mocap'},
+    // phone footage is usually 4K: 150 frames of that is ~15 GB as float images and
+    // crawls through tracking, so the frames are brought to 1280 on the long side first
+    edit:w=>{for(const n of Object.values(w))for(const [k,x] of Object.entries(n.inputs))if(Array.isArray(x)&&x[0]==='86'&&x[1]===0)n.inputs[k]=['86r',0];
+      w['86r']={class_type:'ResizeImageMaskNode',inputs:{input:['86',0],resize_type:'scale longer dimension','resize_type.longer_size':1280,scale_method:'area'}};
+      // MoGe only supplies the camera's field of view (one number) and takes ~9 s a
+      // frame on 8 GB, so it reads the first frame instead of all of them
+      if(w['114']){w['86f']={class_type:'ImageFromBatch',inputs:{image:['86r',0],batch_index:0,length:1}};w['114'].inputs.image=['86f',0]}}}));
   break;}case 'prep-maps':{
   const map=v.map||'Depth';
   if(map==='Edges'){
