@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.27.0
+
+Fixes and polish across the hub.
+
+- **JUMP** button in the header opens the tool search (same as Ctrl+K).
+- Uploads get a **✕ clear** button. Old upload previews are freed from memory when replaced or cleared.
+- Toggles work from the keyboard (Tab, then Space or Enter) and announce their state to screen readers.
+- Face Swap and MiniMax H3 Follow motion say "Upload a Source Face image first" or "Upload a Motion Video first" before anything is uploaded or queued, instead of failing in ComfyUI.
+- Node Canvas accepts tools that take a picture only in some modes (Qwen Image Edit, MiniMax H3, SenseNova Edit) and switches them to that mode, as the Pipeline already did. Its tool lists leave out tools you have turned off, and the prompt box shows for any tool that has a prompt.
+- Action Stage keeps your prompt, sliders, steps, engine, animation settings and last render when you leave the page and come back. Its render button is now the primary button.
+- Stop now finds and cancels stuck Live Canvas and background runs.
+- The system-stats timer stops with the rest of the telemetry when ComfyUI disconnects.
+- Settings backups now include the background, Spectrum, LoRA trigger words, Camera Angle, Night Shift and Live Canvas settings.
+- Fixed: Tools-channel accent colour (`--cat-prep`) was never defined, so i2 Roto showed no colour.
+- The pixel font is embedded once instead of twice (about 34 KB smaller).
+
 ## 1.26.0
 
 Five i2 tools, all in the Full studio profile. Each one runs the graph exactly as it was built in ComfyUI, with its controls brought into the hub.
