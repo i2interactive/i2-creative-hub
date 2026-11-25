@@ -4,14 +4,17 @@ A single-file browser app for [ComfyUI](https://github.com/comfyanonymous/ComfyU
 
 No install, no account, no server of its own. It's one HTML file that talks to the ComfyUI already running on your machine.
 
-![The channel index](screenshots/01-channels.png)
+![The channel index, online, with the latest render on air](screenshots/01-channels.jpg)
 
 ## What's inside
 
-- **Simple tool pages.** Each tool shows the few controls that matter; everything else sits under More settings with tuned defaults.
+- **Simple tool pages.** Each tool shows the few controls that matter; everything else sits under More settings with tuned defaults. **JUMP** (or Ctrl+K) takes you to any tool by name.
 - **Live.** Image tools redraw as you type, on a locked seed, so you can see what each word does. Keep renders the full-quality version.
 - **Live Canvas.** Paint, drop in a photo, or point your camera or screen at it, and the picture re-renders as you go.
 - **World Builder.** Set up a world once (people, places, look, rules), break a script into shots, render chained video takes with sound, assemble one file, or export the timeline as XML for Premiere or Resolve.
+- **OMNI, SHOWRUNNER and MICRODRAMA.** Three full i2 pipelines as one-page tools. OMNI turns an idea into key art, a lens-finished frame, a cutout, depth and a parallax move with sound. SHOWRUNNER turns it into a short film with a script, shots, a title card, a score and a 3D scene. MICRODRAMA makes vertical episodes with a narrator and captions, and carries the story into the next episode.
+- **Cutter.** An assistant editor: point it at a footage folder, give it a track and a one-line-per-beat brief, and it cuts on the beat. You get a preview, a storyboard and an XML for Premiere or Resolve that links to your original media, plus an EDL.
+- **Roto.** AI rotoscoping for real footage up to 6K with LTX-2.5 Alpha Gen: a matte sequence on disk (PNG, EXR or TIFF) plus matte and comp QC videos.
 - **Night Shift.** Leave a brief before bed. Your local LLM writes prompts, renders takes, looks at them, scores them against the brief and steers the next round. You wake up to ranked dailies.
 - **Agent.** Talk to a local LLM (LM Studio) and it checks your models, sets the knobs and runs the job.
 - **A background that moves.** Settings › Background: Flow (a slow field in the colour of the channel you're on, reacting to what you do), an Image (any picture or one of your renders), or plain Black.
@@ -101,13 +104,17 @@ The hub opens with a **Starter** lineup: one strong tool per job. Everything els
 
 | | |
 | --- | --- |
-| ![A tool page](screenshots/02-tool-page.png) | ![Camera dial on Qwen Image 2.1](screenshots/03-camera-dial.png) |
-| ![World Builder](screenshots/04-world-builder.png) | ![Night Shift](screenshots/05-night-shift.png) |
-| ![Agent](screenshots/06-agent.png) | ![Module Library](screenshots/07-module-library.png) |
+| ![OMNI with the prompt it used](screenshots/02-omni.jpg) | ![Qwen Image 2.1 editing a picture with the camera dial](screenshots/03-camera-dial.jpg) |
+| ![MICRODRAMA, ready to carry the story into the next episode](screenshots/08-microdrama.jpg) | ![Cutter with its cut list](screenshots/09-cutter.jpg) |
+| ![World Builder](screenshots/04-world-builder.jpg) | ![Night Shift](screenshots/05-night-shift.jpg) |
+| ![Roto](screenshots/10-roto.jpg) | ![JUMP: any tool by name](screenshots/11-jump.jpg) |
+| ![Agent](screenshots/06-agent.jpg) | ![Settings and the Module Library](screenshots/07-module-library.jpg) |
+
+The renders in these screenshots came from the OMNI, SHOWRUNNER and MICRODRAMA workflows on an RTX 3070 Ti (8 GB).
 
 ## Requirements
 
-- **ComfyUI** 0.40 or newer recommended (0.37 is the minimum for Qwen Image 2.1; the front page tells you if a tool needs a newer ComfyUI).
+- **ComfyUI** 0.40 or newer recommended (0.37 is the minimum for Qwen Image 2.1; the front page tells you if a tool needs a newer ComfyUI). OMNI, SHOWRUNNER, MICRODRAMA, Roto and Cutter were built and tested on 0.46.3.
 - **An NVIDIA GPU.** 8GB works for most tools; 12GB or more is more comfortable for video. The RTX tools need an RTX card, and RTX frame generation needs a 40-series or newer.
 - **32GB of system RAM** recommended for video and 3D.
 - **Chrome or Edge.**
