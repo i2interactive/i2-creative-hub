@@ -73,6 +73,7 @@ The hub opens with a **Starter** lineup: one strong tool per job. Everything els
 | Image | **Mage Flow Turbo** | Four-step picture maker — quick and easy on VRAM |
 | Image | **Mage Flow Edit** | Upload a photo, say what to change — four steps |
 | Image | **Krea 2 Style Reference** | Give it a picture to copy the look from, then describe a new scene |
+| Image | **SenseNova U1.6** | One model that draws, reasons, writes and edits — posters with real text, illustrated answers, questions about a picture (ComfyUI 0.46+) |
 | Image | **Anima** | Makes anime style pictures from your words |
 | Video | **Frame Interpolation** | Smooths choppy video or makes clean slow motion |
 | Upscale | **Traditional Upscale** | Makes your picture bigger without changing anything |

@@ -118,6 +118,7 @@ Most links go to the official Comfy-Org repackaged files. Where a tool offers va
 | File | Put it in | Needed for | Get it |
 | --- | --- | --- | --- |
 | `dino_v3_vit_h.safetensors` | `models/clip_vision` | Gaussian Splats (only with Tripo Splat) | [download](https://huggingface.co/VAST-AI/TripoSplat/resolve/main/clip_vision/dino_v3_vit_h.safetensors) |
+| `sensenova_u1.6_8b_mot_int8_convrot.safetensors` | `models/checkpoints` | SenseNova U1.6 | [download](https://huggingface.co/Comfy-Org/SenseNova-U1/resolve/main/checkpoints/sensenova_u1.6_8b_mot_int8_convrot.safetensors) |
 | `anima-base-v1.0.safetensors` | `models/diffusion_models` | Anima | [download](https://huggingface.co/circlestone-labs/Anima/resolve/main/split_files/diffusion_models/anima-base-v1.0.safetensors) |
 | `anima-preview2.safetensors` | `models/diffusion_models` | Anima (only with anima-preview2.safetensors) | [search Hugging Face](https://huggingface.co/models?search=anima-preview2) |
 | `mage_flow_edit_turbo_int8_convrot.safetensors` | `models/diffusion_models` | Mage Flow Edit | [download](https://huggingface.co/Comfy-Org/Mage-Flow/resolve/main/diffusion_models/mage_flow_edit_turbo_int8_convrot.safetensors) |
@@ -127,6 +128,7 @@ Most links go to the official Comfy-Org repackaged files. Where a tool offers va
 | `film_net_fp16.safetensors` | `models/frame_interpolation` | Frame Interpolation | [download](https://huggingface.co/Comfy-Org/frame_interpolation/resolve/main/frame_interpolation/film_net_fp16.safetensors) |
 | `inswapper_128.onnx` | `models/insightface` | Face Swap | see the ReActor install notes |
 | `krea2_style_reference.safetensors` | `models/loras` | Krea 2 Style Reference | [download](https://huggingface.co/Comfy-Org/Krea-2/resolve/main/loras/krea2_style_reference.safetensors) |
+| `sensenova_u1.6_8b_mot_8step_lora_bf16.safetensors` | `models/loras` | SenseNova U1.6 (only with Turbo) | [download](https://huggingface.co/Comfy-Org/SenseNova-U1/resolve/main/loras/sensenova_u1.6_8b_mot_8step_lora_bf16.safetensors) |
 | `gemma4_e4b_it_fp8_scaled.safetensors` | `models/text_encoders` | Gemma 4 Vision | [download](https://huggingface.co/Comfy-Org/gemma-4/resolve/main/text_encoders/gemma4_e4b_it_fp8_scaled.safetensors) |
 | `qwen3vl_4b_bf16.safetensors` | `models/text_encoders` | Mage Flow Edit; Mage Flow Turbo | [download](https://huggingface.co/Comfy-Org/Mage-Flow/resolve/main/text_encoders/qwen3vl_4b_bf16.safetensors) |
 | `qwen_3_06b_base.safetensors` | `models/text_encoders` | Anima | [download](https://huggingface.co/circlestone-labs/Anima/resolve/main/split_files/text_encoders/qwen_3_06b_base.safetensors) |

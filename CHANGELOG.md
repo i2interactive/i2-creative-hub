@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.25.0
+
+- New tool: **SenseNova U1.6** (Image, off by default; turn it on in Settings › Module Library, or pick Full studio). One 8B model that draws, reasons, writes and edits, built node-for-node from ComfyUI's two SenseNova templates. Needs ComfyUI 0.46 or newer. Five modes:
+  - **Create**: a picture from your prompt. Words in quotes are drawn as written.
+  - **Think**: the model reasons about the layout in text, then draws. Its reasoning shows next to the result.
+  - **Illustrated**: the model writes an answer and draws pictures where they help (a step-by-step guide, a short comic, a scene in beats). The pictures appear inside the text, where the model put them. Up to 8 pictures; each one is another render.
+  - **Ask**: answers in words, about up to three pictures if you add them. No image is rendered, so it's the quickest mode.
+  - **Edit**: change the picture you upload, with up to two extra reference pictures.
+  - **Self-correction** (Create and Edit): checks the picture against your prompt, flags garbled text, typos and wrong numbering, and redraws, up to five passes.
+  - **Turbo** (8-step LoRA, CFG 1) or **Quality** (50 steps, CFG 4; the negative prompt only applies here). Any aspect from 21:9 to 9:16, 0.5–4 MP; it starts at 2 MP for 8 GB cards.
+  - Words and reasoning come back next to the render, with Copy and Send to. Live, Night Shift and pipelines use it as a picture tool (Create or Think).
+  - The templates' Qwen3.5-9B prompt rewriter (8.8 GB) is left out; ✦ Enhance does that job. Download buttons for both model files.
+- Fixed: Template Import misread nodes with grow-as-you-connect inputs (TextGenerateV2's images, videos and audios). Their saved settings shifted by three, so Thinking came out off when the template had it on.
+
 ## 1.24.0
 
 - A living background in place of flat black. **Flow** is a slow field that takes the colour of the channel you're on, bends around your pointer, quickens a little while you type or render, and blooms when a render lands. It draws at a fraction of screen size, drops to 15 fps during renders and 10 when you're idle, and stops when the tab is hidden; on an RTX 3070 Ti a Z-Image render took 6.7 s with it on and 6.4 s with it off (within run-to-run noise).
