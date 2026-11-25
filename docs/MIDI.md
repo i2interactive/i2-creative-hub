@@ -85,7 +85,7 @@ Each click changes the open tool's control and a readout shows what changed (for
 ## Not mapped
 
 - Anything on a page without that control: the readout says so ("Not on Z-Image Turbo", "No quality presets on Finish"). Nothing changes.
-- RUN on the i2 Agent, Prompt Lab, Template Import, Gallery, Settings and the guide: nothing to run.
+- RUN on the Agent, Prompt Lab, Template Import, Gallery, Settings and the guide: nothing to run.
 - UPSC and SEND on videos, audio and 3D results: pictures only (open Video Upscale with a W pad for video).
 - The wheel on Live Canvas, World Builder and the other custom pages: they have their own controls.
 - Nothing goes back to the Tracker. The HUB deck only shows how far you turned the wheel, not the hub's values, and doesn't light pads from the computer (the firmware lights pads from the host only on Mackie Control decks).

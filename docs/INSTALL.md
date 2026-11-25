@@ -7,7 +7,7 @@ This gets the i2 interactive Creative Hub (1.24.0) running against your own Comf
 - Windows or Linux with an **NVIDIA GPU**. The hub was built on an RTX 3070 Ti (8GB) with 32GB of RAM. 8GB runs most tools; video and 3D are happier with 12GB or more.
 - **ComfyUI 0.40 or newer** (portable, desktop or a git install). 0.37 is the minimum for Qwen Image 2.1; older versions lose a few tools, and the hub's front page names which.
 - **Chrome or Edge.**
-- Optional: **LM Studio** for the i2 Agent, Night Shift, Enhance, Variations and Breed.
+- Optional: **LM Studio** for the Agent, Night Shift, Enhance, Variations and Breed.
 - Optional: a **Polyend Tracker running i2 DECK**, to drive the hub over USB MIDI. Setup and the full map: [MIDI.md](MIDI.md).
 
 ## 2. Start ComfyUI so the hub can reach it
@@ -43,9 +43,9 @@ ComfyUI Manager only installs packs from its own list at its default security le
 | **ReActor** | Face Swap (off by default) | |
 | Tripo, Sharp and GeomPack nodes | Gaussian Splats (off by default) | Use ComfyUI Manager › Install Missing Custom Nodes on the template. |
 | Searge and Qwen multi-angle camera nodes | Camera Angle (off by default) | Same as above. |
-| **ComfyUI-i2-Roto** | i2 Roto | [GitHub](https://github.com/i2interactive/ComfyUI-i2-Roto). If Manager doesn't list it yet, use Manager › Install via Git URL. |
-| **ComfyUI-i2-Cutter** | i2 Cutter | [GitHub](https://github.com/i2interactive/ComfyUI-i2-Cutter). Same as above. CLIP matching downloads `openai/clip-vit-large-patch14` (about 1.7 GB) the first time. |
-| **ComfyUI-Qwen-TTS** (flybirdxx) | i2 MICRODRAMA's narrator | [GitHub](https://github.com/flybirdxx/ComfyUI-Qwen-TTS). Keep transformers below 5.0. The 1.7B VoiceDesign model downloads to `models/qwen-tts` on first use. |
+| **ComfyUI-i2-Roto** | Roto | [GitHub](https://github.com/i2interactive/ComfyUI-i2-Roto). If Manager doesn't list it yet, use Manager › Install via Git URL. |
+| **ComfyUI-i2-Cutter** | Cutter | [GitHub](https://github.com/i2interactive/ComfyUI-i2-Cutter). Same as above. CLIP matching downloads `openai/clip-vit-large-patch14` (about 1.7 GB) the first time. |
+| **ComfyUI-Qwen-TTS** (flybirdxx) | MICRODRAMA's narrator | [GitHub](https://github.com/flybirdxx/ComfyUI-Qwen-TTS). Keep transformers below 5.0. The 1.7B VoiceDesign model downloads to `models/qwen-tts` on first use. |
 
 If a tool needs a node you don't have, the hub stops before anything is queued and names the missing node.
 
@@ -143,7 +143,7 @@ Most links go to the official Comfy-Org repackaged files. Where a tool offers va
 
 **LoRAs** go in `models/loras`. The LoRA Stack on each tool lists what you have, and the hub reads trigger words from the files where it can. A speed LoRA made for a tool's model (for example `…lightning…8steps`) is used automatically for Live drafts. The camera dial on Qwen Image 2.1 needs the [Multiple-Angles LoRA](https://huggingface.co/akhaliq/Qwen-Image-2.1-Multiple-Angles-LoRA).
 
-### i2 Roto (LTX-2.5 Alpha Gen)
+### Roto (LTX-2.5 Alpha Gen)
 
 LTX-2.5 is free for companies under $10M a year in revenue; above that it needs a licence from Lightricks. The Alpha Gen LoRA is gated: accept its terms on Hugging Face before downloading.
 
@@ -155,16 +155,16 @@ LTX-2.5 is free for companies under $10M a year in revenue; above that it needs 
 | `ltx-2.5-audio-vae-bf16.safetensors` | `models/vae` | [download](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/vae/ltx-2.5-audio-vae-bf16.safetensors) |
 | `gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors` | `models/text_encoders` | [download](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors) |
 
-### i2 OMNI, SHOWRUNNER and MICRODRAMA
+### OMNI, SHOWRUNNER and MICRODRAMA
 
 These use files already listed above: Z-Image Turbo (int8), `qwen_3_4b`, `ae`, MoGe, BiRefNet and Stable Audio 3 with `t5gemma_b_b_ul2`. The LLM script writer uses `qwen3vl_4b_fp8_scaled`; OMNI's hi-res pass uses `RealESRGAN_x4plus` and its Smooth ×2 uses `film_net_fp16`. Every one has a Download button in the hub.
 
 ## 6. LM Studio (optional)
 
-The i2 Agent, Night Shift, prompt Enhance, Variations and Breed use a local LLM through LM Studio.
+The Agent, Night Shift, prompt Enhance, Variations and Breed use a local LLM through LM Studio.
 
 1. Install [LM Studio](https://lmstudio.ai).
-2. Open the hub's **i2 Agent** page. The LM Studio panel there can download and load the recommended model (Qwen3.5 4B) in one click.
+2. Open the hub's **Agent** page. The LM Studio panel there can download and load the recommended model (Qwen3.5 4B) in one click.
 3. In LM Studio, go to **Developer › Server Settings** and turn on **Enable CORS**. Then start the server (default port 1234). Tick "Run the LLM server on login" if you want it always on.
 4. Any OpenAI-compatible server works too: set the address, model name and key under **Connection settings** on the Agent page.
 

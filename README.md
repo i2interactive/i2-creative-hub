@@ -13,7 +13,7 @@ No install, no account, no server of its own. It's one HTML file that talks to t
 - **Live Canvas.** Paint, drop in a photo, or point your camera or screen at it, and the picture re-renders as you go.
 - **World Builder.** Set up a world once (people, places, look, rules), break a script into shots, render chained video takes with sound, assemble one file, or export the timeline as XML for Premiere or Resolve.
 - **Night Shift.** Leave a brief before bed. Your local LLM writes prompts, renders takes, looks at them, scores them against the brief and steers the next round. You wake up to ranked dailies.
-- **i2 Agent.** Talk to a local LLM (LM Studio) and it checks your models, sets the knobs and runs the job.
+- **Agent.** Talk to a local LLM (LM Studio) and it checks your models, sets the knobs and runs the job.
 - **A background that moves.** Settings › Background: Flow (a slow field in the colour of the channel you're on, reacting to what you do), an Image (any picture or one of your renders), or plain Black.
 - **One-click downloads.** Missing model files download straight into ComfyUI's models folder, and missing node packs install through ComfyUI Manager, from the same screen that says they're missing. Settings › Downloads › **Find what's missing** checks every active tool at once.
 - **Template Import.** ComfyUI's own template library, inside the hub. Pick a template, see which model files you're missing, and turn it into a hub tool. New models usually land there on release day.
@@ -63,7 +63,7 @@ The hub opens with a **Starter** lineup: one strong tool per job. Everything els
 | Workflows | **Character Sheet** | One prompt becomes a consistent character from many angles |
 | Workflows | **Template Import** | Turn any ComfyUI template or workflow into a hub tool — new models usually land in the library on release day |
 | Workflows | **World Builder** | Set up a world once (places, people, look, rules), script it into shots, render chained video takes, and export the timeline to Premiere or Resolve |
-| Agent | **i2 Agent** | Ask in plain words and your local LLM runs the hub for you |
+| Agent | **Agent** | Ask in plain words and your local LLM runs the hub for you |
 | Agent | **Night Shift** | Leave a brief; your local LLM makes takes overnight, reviews them and steers the next round |
 
 <details><summary>Also included, switched off by default</summary>
@@ -89,11 +89,11 @@ The hub opens with a **Starter** lineup: one strong tool per job. Everything els
 | Workflows | **Prompt Blast** | Renders every saved prompt preset in one go |
 | Workflows | **Pipeline** | Chain tools in a line so each step feeds the next |
 | Workflows | **Node Canvas** | A board where you wire tools together any way you like |
-| Tools | **i2 Roto** | AI roto for real footage up to 6K: a matte sequence on disk plus QC videos (LTX-2.5 Alpha Gen; needs the ComfyUI-i2-Roto pack) |
-| Workflows | **i2 Cutter** | Footage folder, a track and a brief in; a cut on the beat out, as a preview, an XML for Premiere or Resolve and an EDL (needs the ComfyUI-i2-Cutter pack) |
-| Workflows | **i2 OMNI** | One idea gives you key art, lens finish, cutout, depth, a parallax move and a sound bed in one run |
-| Workflows | **i2 SHOWRUNNER** | An idea becomes a short film: script, shots with camera moves, a title card, a score and a 3D scene |
-| Workflows | **i2 MICRODRAMA** | Vertical micro-drama episodes with a narrator, captions and music, carried from episode to episode |
+| Tools | **Roto** | AI roto for real footage up to 6K: a matte sequence on disk plus QC videos (LTX-2.5 Alpha Gen; needs the ComfyUI-i2-Roto pack) |
+| Workflows | **Cutter** | Footage folder, a track and a brief in; a cut on the beat out, as a preview, an XML for Premiere or Resolve and an EDL (needs the ComfyUI-i2-Cutter pack) |
+| Workflows | **OMNI** | One idea gives you key art, lens finish, cutout, depth, a parallax move and a sound bed in one run |
+| Workflows | **SHOWRUNNER** | An idea becomes a short film: script, shots with camera moves, a title card, a score and a 3D scene |
+| Workflows | **MICRODRAMA** | Vertical micro-drama episodes with a narrator, captions and music, carried from episode to episode |
 
 </details>
 
@@ -103,7 +103,7 @@ The hub opens with a **Starter** lineup: one strong tool per job. Everything els
 | --- | --- |
 | ![A tool page](screenshots/02-tool-page.png) | ![Camera dial on Qwen Image 2.1](screenshots/03-camera-dial.png) |
 | ![World Builder](screenshots/04-world-builder.png) | ![Night Shift](screenshots/05-night-shift.png) |
-| ![i2 Agent](screenshots/06-agent.png) | ![Module Library](screenshots/07-module-library.png) |
+| ![Agent](screenshots/06-agent.png) | ![Module Library](screenshots/07-module-library.png) |
 
 ## Requirements
 
@@ -112,7 +112,7 @@ The hub opens with a **Starter** lineup: one strong tool per job. Everything els
 - **32GB of system RAM** recommended for video and 3D.
 - **Chrome or Edge.**
 - **ComfyUI Manager** (optional) to install missing node packs from the hub.
-- **LM Studio** (optional) for the i2 Agent, Night Shift, prompt Enhance and Variations.
+- **LM Studio** (optional) for the Agent, Night Shift, prompt Enhance and Variations.
 
 ## Privacy
 

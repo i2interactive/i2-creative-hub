@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.27.1
+
+- Tool names drop the "i2": **Roto**, **Cutter**, **OMNI**, **SHOWRUNNER**, **MICRODRAMA** and **Agent** (was i2 Agent). Nothing else changes; saved settings and gallery items carry over.
+
 ## 1.27.0
 
 Fixes and polish across the hub.
