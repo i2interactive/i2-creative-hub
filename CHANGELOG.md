@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.25.1
+
+Fixes from the first test of 1.25.0 on a real rig (ComfyUI 0.46.2):
+
+- Fixed: on a fresh form, settings that depend on Mode were hidden until you changed Mode. SenseNova's Self-correction and Aspect Ratio were missing in Create, and Qwen Image 2.1's Aspect Ratio and Megapixels were missing too. Settings in More settings now read the Mode control even though it sits above them.
+- Fixed: SenseNova showed settings that do nothing in the current mode (Turbo steps in Ask, self-correction passes in Think, Illustrated and Ask). A setting can now depend on more than one control.
+- Fixed: SenseNova's answer panel showed text another tool had made, including text from an earlier session. It now shows only answers SenseNova wrote.
+
 ## 1.25.0
 
 - New tool: **SenseNova U1.6** (Image, off by default; turn it on in Settings › Module Library, or pick Full studio). One 8B model that draws, reasons, writes and edits, built node-for-node from ComfyUI's two SenseNova templates. Needs ComfyUI 0.46 or newer. Five modes:
