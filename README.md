@@ -89,6 +89,11 @@ The hub opens with a **Starter** lineup: one strong tool per job. Everything els
 | Workflows | **Prompt Blast** | Renders every saved prompt preset in one go |
 | Workflows | **Pipeline** | Chain tools in a line so each step feeds the next |
 | Workflows | **Node Canvas** | A board where you wire tools together any way you like |
+| Tools | **i2 Roto** | AI roto for real footage up to 6K: a matte sequence on disk plus QC videos (LTX-2.5 Alpha Gen; needs the ComfyUI-i2-Roto pack) |
+| Workflows | **i2 Cutter** | Footage folder, a track and a brief in; a cut on the beat out, as a preview, an XML for Premiere or Resolve and an EDL (needs the ComfyUI-i2-Cutter pack) |
+| Workflows | **i2 OMNI** | One idea gives you key art, lens finish, cutout, depth, a parallax move and a sound bed in one run |
+| Workflows | **i2 SHOWRUNNER** | An idea becomes a short film: script, shots with camera moves, a title card, a score and a 3D scene |
+| Workflows | **i2 MICRODRAMA** | Vertical micro-drama episodes with a narrator, captions and music, carried from episode to episode |
 
 </details>
 

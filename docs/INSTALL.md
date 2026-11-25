@@ -43,6 +43,9 @@ ComfyUI Manager only installs packs from its own list at its default security le
 | **ReActor** | Face Swap (off by default) | |
 | Tripo, Sharp and GeomPack nodes | Gaussian Splats (off by default) | Use ComfyUI Manager › Install Missing Custom Nodes on the template. |
 | Searge and Qwen multi-angle camera nodes | Camera Angle (off by default) | Same as above. |
+| **ComfyUI-i2-Roto** | i2 Roto | [GitHub](https://github.com/i2interactive/ComfyUI-i2-Roto). If Manager doesn't list it yet, use Manager › Install via Git URL. |
+| **ComfyUI-i2-Cutter** | i2 Cutter | [GitHub](https://github.com/i2interactive/ComfyUI-i2-Cutter). Same as above. CLIP matching downloads `openai/clip-vit-large-patch14` (about 1.7 GB) the first time. |
+| **ComfyUI-Qwen-TTS** (flybirdxx) | i2 MICRODRAMA's narrator | [GitHub](https://github.com/flybirdxx/ComfyUI-Qwen-TTS). Keep transformers below 5.0. The 1.7B VoiceDesign model downloads to `models/qwen-tts` on first use. |
 
 If a tool needs a node you don't have, the hub stops before anything is queued and names the missing node.
 
@@ -139,6 +142,22 @@ Most links go to the official Comfy-Org repackaged files. Where a tool offers va
 | `triposplat_vae_decoder_fp16.safetensors` | `models/vae` | Gaussian Splats (only with Tripo Splat) | [download](https://huggingface.co/VAST-AI/TripoSplat/resolve/main/vae/triposplat_vae_decoder_fp16.safetensors) |
 
 **LoRAs** go in `models/loras`. The LoRA Stack on each tool lists what you have, and the hub reads trigger words from the files where it can. A speed LoRA made for a tool's model (for example `…lightning…8steps`) is used automatically for Live drafts. The camera dial on Qwen Image 2.1 needs the [Multiple-Angles LoRA](https://huggingface.co/akhaliq/Qwen-Image-2.1-Multiple-Angles-LoRA).
+
+### i2 Roto (LTX-2.5 Alpha Gen)
+
+LTX-2.5 is free for companies under $10M a year in revenue; above that it needs a licence from Lightricks. The Alpha Gen LoRA is gated: accept its terms on Hugging Face before downloading.
+
+| File | Put it in | Get it |
+| --- | --- | --- |
+| `ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors` | `models/diffusion_models` | [download](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/diffusion_models/ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors) |
+| `ltx-2.5-22b-ic-lora-alpha-gen-0.9.safetensors` | `models/loras` (any subfolder) | [download](https://huggingface.co/Lightricks/LTX-2.5-22b-IC-LoRA-Alpha-Gen/resolve/main/ltx-2.5-22b-ic-lora-alpha-gen-0.9.safetensors) |
+| `ltx-2.5-video-vae-bf16.safetensors` | `models/vae` | [download](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/vae/ltx-2.5-video-vae-bf16.safetensors) |
+| `ltx-2.5-audio-vae-bf16.safetensors` | `models/vae` | [download](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/vae/ltx-2.5-audio-vae-bf16.safetensors) |
+| `gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors` | `models/text_encoders` | [download](https://huggingface.co/Lightricks/LTX-2.5/resolve/main/text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors) |
+
+### i2 OMNI, SHOWRUNNER and MICRODRAMA
+
+These use files already listed above: Z-Image Turbo (int8), `qwen_3_4b`, `ae`, MoGe, BiRefNet and Stable Audio 3 with `t5gemma_b_b_ul2`. The LLM script writer uses `qwen3vl_4b_fp8_scaled`; OMNI's hi-res pass uses `RealESRGAN_x4plus` and its Smooth ×2 uses `film_net_fp16`. Every one has a Download button in the hub.
 
 ## 6. LM Studio (optional)
 

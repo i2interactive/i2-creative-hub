@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.26.0
+
+Five i2 tools, all in the Full studio profile. Each one runs the graph exactly as it was built in ComfyUI, with its controls brought into the hub.
+
+- New tool: **i2 Roto** (Tools). AI rotoscoping for real footage up to 6K with LTX-2.5 Alpha Gen. Drop a clip, or give a path on the ComfyUI PC: a clip, a folder of frames, or a numbered sequence like `plate.####.exr`. You get a matte sequence on disk (PNG 16-bit, EXR half or TIFF 16-bit, optional RGBA) plus matte and comp QC videos and a report. It needs the [ComfyUI-i2-Roto](https://github.com/i2interactive/ComfyUI-i2-Roto) node pack and five LTX-2.5 files, all with Install and Download buttons. The Alpha Gen LoRA is gated on Hugging Face.
+- New tool: **i2 Cutter** (Workflows). An assistant editor. Give it a footage folder, a music track (dropped in or a path) and a brief, one story beat per line. It cuts on the beat and gives you a preview, a storyboard, the cut list and download links for an FCP 7 XML (Premiere, Resolve), an EDL and a cut-list JSON. It needs the [ComfyUI-i2-Cutter](https://github.com/i2interactive/ComfyUI-i2-Cutter) node pack.
+- New tool: **i2 OMNI** (Workflows). One idea, or a picture, gives you key art, a lens-finished frame, a cutout with alpha, a depth map, a contact sheet and a parallax move with a sound bed. The prompt it used shows next to the results.
+- New tool: **i2 SHOWRUNNER** (Workflows). An idea becomes a short film: script (written by the LLM or pasted in), key art, a still per shot, camera moves, a title card, a score and a 3D scene of the key art.
+- New tool: **i2 MICRODRAMA** (Workflows). Vertical micro-drama episodes with a narrator, captions and music. After each episode, **Carry into the next episode** fills in the story so far and the next episode number. The narrator needs the [ComfyUI-Qwen-TTS](https://github.com/flybirdxx/ComfyUI-Qwen-TTS) node pack (keep transformers below 5.0).
+- In the three i2 workflows, switches you turn off drop out of the graph with their models. With sound off, Stable Audio never loads. With no picture, nothing is loaded from disk. The i2 look LoRA is used when it is installed; otherwise the graph runs on plain Z-Image Turbo.
+- Models stored in subfolders are found by name. A graph that asks for `LTX\x.safetensors` runs whether your copy sits in `loras/` or `loras/LTX/`.
+- Music and audio can be dropped on upload fields. They get a player instead of a broken thumbnail.
+- Fixed: single-line text fields never showed. Face Swap's face indexes and Krea 2's LoRA trigger words are back.
+- Fixed: Template Import misread hand-written workflow files whose widget inputs lack the editor's widget marker. Saved values shifted onto the wrong inputs. One of ComfyUI's own templates (Bria product holding) now keeps its image names too.
+
 ## 1.25.3
 
 From a full check of the hub on an RTX 3070 Ti 8 GB (ComfyUI 0.46.3):
